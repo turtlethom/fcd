@@ -1,0 +1,27 @@
+<-------------------------- GOAL -------------------------->
+:> Make a linux tool that leverages 'fzf' (fuzzy finder) to list directories.
+<------------------------ SIDE GOALS ---------------------->
+<-- SIDE GOALS -->
+:> Use '-a' flag to add new bookmarked directory (if directory exists)
+:> Use '-r' flag to remove bookmarked directory (if directory exists)
+:> Use '-p' flag to print ALL bookmarked directory paths to console
+*:> Use '-c' to provide a custom directory file path (check ONLY directories)
+:> Create man page for fcd
+<-------------------------- USAGE ------------------------->
+<| fcd [OPTION] [DIRECTORY] |>
+<-------------------------- LOCALS ------------------------>
+[BOOKMARKS - .fcd.txt] 
+  -> Store directory paths in txt file
+  -> Uses format for each line: "SOME_LABEL=/some/directory/path"
+  -> Mounts only on the HOME directory for safety!
+
+[ORDERED_LABELS - ARRAY]
+  -> Store LABELS parsed from .fcd.txt
+  -> Ex: 'NEOVIM=/.config/nvim' = 'NEOVIM'
+
+[PATHS - DICTIONARY/ASSOCIATIVE ARRAY]
+  -> Store key:value pairs from .fcd.txt
+  -> Ex: 'NEOVIM=/.config/nvim' = 'NEOVIM':'/.config/nvim'
+
+[USER_SELECTION]
+  -> Store the current user selection for chosen directory shortcut
