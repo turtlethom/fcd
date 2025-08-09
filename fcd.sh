@@ -1,5 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
+ROOT_DIR="$(dirname "${BASH_SOURCE[0]}")"
+FCD_FILE="$ROOT_DIR/.fcd.txt"
+source "$ROOT_DIR/lib/fcd_help.sh"
+source "$ROOT_DIR/lib/fcd_print.sh"
+source "$ROOT_DIR/lib/fcd_add.sh"
+source "$ROOT_DIR/lib/fcd_clear.sh"
 #############################################################################
 #<< ***** --- ( FCD ) --- ***** >># 
 # ->* Stands for 'fast/fuzzy change directory'
@@ -10,20 +16,15 @@
 #############################################################################
 
 fcd() {
-  local BOOKMARKED="./dev/.pcd.txt"
-  declare -a ORDERED_LABELS
-  declare -A PATHS
-  local SELECTED_KEY
-
   # Confirm user is using command flag
-  if [[ $# -lt 2 && "$1" != "-p" ]]; then
+  if [[ $# -lt 2 && "$1" != "-p" && "$1" != "-h" && "$1" != "-c" ]]; then
     echo "Usage: fcd [-a string | -c path | -r word | -p]" >&2
     return 1
   fi
   # Check command flags
   current_flag=""
   current_flag_val=""
-  flag_error_message="Error: Only one flag can be used at a time.">&2
+  flag_error_message="Error: Only one flag can be used at a time."
   while [[ $# -gt 0 ]]; do
     case "$1" in
       # PRINT TO CONSOLE
@@ -35,11 +36,33 @@ fcd() {
         current_flag="-p"
         current_flag_val=""
         # Logic For Printing Bookmarks To Console
-        echo "Using -p"
+        fcd_print "$FCD_FILE"
         shift
         ;;
-      # ADD BK, REMOVE BK, CUSTOM DIR
-      -a|-r|-c)
+      # Help With Command Syntax
+      -h)
+        if [[ -n "$current_flag" ]]; then
+          echo "$flag_error_message" >&2
+          return 1
+        fi
+        current_flag="-h"
+        current_flag_val=""
+        # Print fcd documentation
+        fcd_help
+        shift
+        ;;
+      -c)
+        if [[ -n "$current_flag" ]]; then
+          echo "$flag_error_message" >&2
+          return 1
+        fi
+        current_flag="-c"
+        current_flag_val=""
+        fcd_clear "$FCD_FILE"
+        shift
+        ;;
+      # ADD BK, REMOVE BK
+      -a|-r)
         if [[ -n "$current_flag" ]]; then
           echo "$flag_error_message" >&2
           return 1
@@ -53,13 +76,10 @@ fcd() {
         # Handle each
         if [[ "$current_flag" == "-a" ]]; then
           # Handle adding a label:directory
-          echo "Using -a"
+          fcd_add "$current_flag_val"
         elif [[ "$current_flag" == "-r" ]]; then
           # Handle removing a label:directory based on label
           echo "Using -r"
-        elif [[ "$current_flag" == "-c" ]]; then
-          # Handle using fcd with a custom dir
-          echo "Using -c"
         fi
         shift 2
         ;;
