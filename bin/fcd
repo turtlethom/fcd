@@ -12,7 +12,7 @@ source "$ROOT_DIR/lib/utils.sh"
 fcd() {
   # Check
   if [[ $# -lt 2 && "$1" != "-p" && "$1" != "-h" && "$1" != "-c" ]]; then
-    echo "Usage: fcd [ -a 'LABEL=\$HOME/PATH' | -r 'LABEL' | -p | -c | -h ]" >&2
+    echo "Usage: fcd [ -a 'LABEL:~/PATH' | -r 'LABEL' | -p | -c | -h ]" >&2
     return 1
   fi
   local current_flag=""
