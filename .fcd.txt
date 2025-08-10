@@ -1,1 +1,0 @@
-WOAH=/home/user/.config/nvim
