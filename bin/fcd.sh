@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-ROOT_DIR="$(dirname "${BASH_SOURCE[0]}")"
-FCD_FILE="$ROOT_DIR/.fcd.txt"
+ROOT_DIR="$( dirname "$(dirname "${BASH_SOURCE[0]}")")"
+FCD_FILE="$ROOT_DIR/data/.fcd.txt"
 
 source "$ROOT_DIR/lib/fcd_help.sh"
 source "$ROOT_DIR/lib/fcd_print.sh"
@@ -48,7 +48,7 @@ fcd() {
         check_flag_arg "$2" "-a" || return 1
         current_flag="-a"
         current_flag_val="$2"
-        fcd_add "$current_flag_val"
+        fcd_add "$FCD_FILE" "$current_flag_val"
         shift 2
         ;;
       # <--- REMOVE BOOKMARK FROM '.fcd.txt' ---> #
@@ -57,7 +57,7 @@ fcd() {
         check_flag_arg "$2" "-r" || return 1
         current_flag="-r"
         current_flag_val="$2"
-        # fcd_remove "$current_flag_val"
+        # fcd_remove "$current_flag_val" "$FCD_FILE"
         shift 2
         ;;
       # <--- USE FZF TO SEARCH BOOKMARKS ---> #
