@@ -10,7 +10,11 @@ source "$ROOT_DIR/lib/fcd_clear.sh"
 source "$ROOT_DIR/lib/utils.sh"
 
 fcd() {
-  # Check
+  # If file doesn't exist, create it
+  if [[ ! -f "$FCD_FILE" ]]; then
+    touch "$FCD_FILE"
+  fi
+  # Initial flag check
   if [[ $# -lt 2 && "$1" != "-p" && "$1" != "-h" && "$1" != "-c" ]]; then
     echo "Usage: fcd [ -a 'LABEL:~/PATH' | -r 'LABEL' | -p | -c | -h ]" >&2
     return 1
