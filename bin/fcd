@@ -7,6 +7,7 @@ source "$ROOT_DIR/lib/fcd_help.sh"
 source "$ROOT_DIR/lib/fcd_print.sh"
 source "$ROOT_DIR/lib/fcd_add.sh"
 source "$ROOT_DIR/lib/fcd_clear.sh"
+source "$ROOT_DIR/lib/fcd_remove.sh"
 source "$ROOT_DIR/lib/utils.sh"
 
 fcd() {
@@ -61,7 +62,7 @@ fcd() {
         check_flag_arg "$2" "-r" || return 1
         current_flag="-r"
         current_flag_val="$2"
-        # fcd_remove "$current_flag_val" "$FCD_FILE"
+        fcd_remove "$FCD_FILE" "$current_flag_val"
         shift 2
         ;;
       # <--- USE FZF TO SEARCH BOOKMARKS ---> #

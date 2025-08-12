@@ -6,6 +6,7 @@ fcd_add() {
   local fcd_file="$1"
   local lp_input="$2"
   local lp_label="${lp_input%%:*}"
+  lp_label="${lp_label^^}"
   local lp_path="${lp_input#*:}"
   local lp_adj_path="${lp_path/#\~/$HOME}"
 

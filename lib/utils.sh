@@ -41,7 +41,14 @@ find_label_or_path() {
   local fcd_file="$1"
   local lp_label="$2"
   local lp_path="$3"
-  find_bookmark_label "$fcd_file" "$lp_label"|| find_bookmark_path "$fcd_file" "$lp_path"
+  find_bookmark_label "$fcd_file" "$lp_label" || find_bookmark_path "$fcd_file" "$lp_path"
+}
+
+find_label_and_path() {
+  local fcd_file="$1"
+  local lp_label="$2"
+  local lp_path="$3"
+  find_bookmark_label "$fcd_file" "$lp_label" && find_bookmark_path "$fcd_file" "$lp_path"
 }
 
 write_bookmark() {
