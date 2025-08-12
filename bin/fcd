@@ -15,15 +15,22 @@ fcd() {
   if [[ ! -f "$FCD_FILE" ]]; then
     touch "$FCD_FILE"
   fi
-  # Initial flag check
-  if [[ $# -lt 2 && "$1" != "-p" && "$1" != "-h" && "$1" != "-c" ]]; then
-    echo "Usage: fcd [ -a 'LABEL:~/PATH' | -r 'LABEL' | -p | -c | -h ]" >&2
-    return 1
+
+  # Handle no args provided (MAIN FUNCTIONALITY with fzf)
+  if [[ $# -eq 0 ]]; then
+    echo "[DEBUG]: Using fcd"
+    return
   fi
+
+  # Handle with LABEL argument
+  if [[ $# -eq 1 && "$1" != -* ]]; then
+    echo "[DEBUG]: Using fcd [$1]"
+    return
+  fi
+
   local current_flag=""
   local current_flag_val=""
   local flag_error_message="Error: Only one flag can be used at a time."
-
   while [[ $# -gt 0 ]]; do
     case "$1" in
       # <--- PRINT BOOKMARKS (.fcd.txt) TO CONSOLE ---> #
@@ -62,7 +69,7 @@ fcd() {
         check_flag_arg "$2" "-r" || return 1
         current_flag="-r"
         current_flag_val="$2"
-        fcd_remove "$FCD_FILE" "$current_flag_val"
+        fcd_remove "$FCD_FILE" "$current_flag_val" || return 1
         shift 2
         ;;
       # <--- USE FZF TO SEARCH BOOKMARKS ---> #
