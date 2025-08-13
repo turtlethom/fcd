@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-fcd_help() {
+__fcd_help() {
   printf "fcd - fast 'cd' with fuzzy finder\n\n"
   printf "Usage:\n"
   printf "  fcd -a ['LABEL/\$HOME/PATH']\n" 

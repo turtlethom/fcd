@@ -1,6 +1,6 @@
 source "$(dirname "${BASH_SOURCE[0]}")/utils.sh"
 
-fcd_remove() {
+__fcd_remove() {
   local file="$1"
   local label="$2"
   label="${label^^}"

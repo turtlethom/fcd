@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-fcd_print() {
+__fcd_print() {
   if [[ ! -s "$1" ]]; then
     echo "Bookmarks empty."
   else

@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 
-ROOT_DIR="$( dirname "$(dirname "${BASH_SOURCE[0]}")")"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 FCD_FILE="$ROOT_DIR/.fcd.txt"
 
+source "$ROOT_DIR/lib/fcd_fzf.sh"
 source "$ROOT_DIR/lib/fcd_help.sh"
 source "$ROOT_DIR/lib/fcd_print.sh"
 source "$ROOT_DIR/lib/fcd_add.sh"
@@ -19,6 +21,7 @@ fcd() {
   # Handle no args provided (MAIN FUNCTIONALITY with fzf)
   if [[ $# -eq 0 ]]; then
     echo "[DEBUG]: Using fcd"
+    __fcd_fzf "$FCD_FILE"
     return
   fi
 
@@ -35,41 +38,41 @@ fcd() {
     case "$1" in
       # <--- PRINT BOOKMARKS (.fcd.txt) TO CONSOLE ---> #
       -p)
-        check_flag_used "$current_flag" "$flag_error_message" || return 1
+        __check_flag_used "$current_flag" "$flag_error_message" || return 1
         current_flag="-p"
-        fcd_print "$FCD_FILE"
+        __fcd_print "$FCD_FILE"
         shift
         ;;
       # <--- PRINT FCD DOCUMENTATION TO CONSOLE ---> #
       -h)
-        check_flag_used "$current_flag" "$flag_error_message" || return 1
+        __check_flag_used "$current_flag" "$flag_error_message" || return 1
         current_flag="-h"
-        fcd_help
+        __fcd_help
         shift
         ;;
       # <--- CLEAR ALL BOOKMARKS FROM '.fcd.txt' ---> #
       -c)
         check_flag_used "$current_flag" "$flag_error_message" || return 1
         current_flag="-c"
-        fcd_clear "$FCD_FILE"
+        __fcd_clear "$FCD_FILE"
         shift
         ;;
       # <--- ADD BOOKMARK TO '.fcd.txt' ---> #
       -a)
-        check_flag_used "$current_flag" "$flag_error_message" || return 1
-        check_flag_arg "$2" "-a" || return 1
+        __check_flag_used "$current_flag" "$flag_error_message" || return 1
+        __check_flag_arg "$2" "-a" || return 1
         current_flag="-a"
         current_flag_val="$2"
-        fcd_add "$FCD_FILE" "$current_flag_val"
+        __fcd_add "$FCD_FILE" "$current_flag_val"
         shift 2
         ;;
       # <--- REMOVE BOOKMARK FROM '.fcd.txt' ---> #
       -r)
-        check_flag_used "$current_flag" "$flag_error_message" || return 1
-        check_flag_arg "$2" "-r" || return 1
+        __check_flag_used "$current_flag" "$flag_error_message" || return 1
+        __check_flag_arg "$2" "-r" || return 1
         current_flag="-r"
         current_flag_val="$2"
-        fcd_remove "$FCD_FILE" "$current_flag_val" || return 1
+        __fcd_remove "$FCD_FILE" "$current_flag_val" || return 1
         shift 2
         ;;
       # <--- USE FZF TO SEARCH BOOKMARKS ---> #
@@ -80,4 +83,3 @@ fcd() {
       esac
     done
 }
-

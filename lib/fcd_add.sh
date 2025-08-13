@@ -2,7 +2,7 @@
 
 source "$(dirname "${BASH_SOURCE[0]}")/utils.sh"
 
-fcd_add() {
+__fcd_add() {
   local fcd_file="$1"
   local lp_input="$2"
   local lp_label="${lp_input%%:*}"
@@ -26,9 +26,9 @@ fcd_add() {
     return 1
   fi
   # Handle finding label or path in file, write bookmark conditionally
-  if find_label_or_path "$fcd_file" "$lp_label" "$lp_adj_path"; then
-    write_bookmark "$fcd_file" "$lp_label:$lp_adj_path" 0
+  if __find_label_or_path "$fcd_file" "$lp_label" "$lp_adj_path"; then
+    __write_bookmark "$fcd_file" "$lp_label:$lp_adj_path" 0
   else
-    write_bookmark "$fcd_file" "$lp_label:$lp_adj_path" 1
+    __write_bookmark "$fcd_file" "$lp_label:$lp_adj_path" 1
   fi
 }
