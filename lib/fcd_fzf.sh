@@ -11,7 +11,7 @@ __fcd_fzf() {
   declare -a labels_in_order=()
 
   while IFS=":" read -r label path; do
-    if [[ -z "$label" && -z "$path" ]]; then
+    if [[ -z "$label" || -z "$path" ]]; then
       continue
     fi
 
@@ -29,7 +29,7 @@ __fcd_fzf() {
     return 1
   fi
 
-  local -a prefexed_labels=()
+  local -a prefixed_labels=()
   local prefix_index=0
   for label in "${labels_in_order[@]}"; do
     local prefix

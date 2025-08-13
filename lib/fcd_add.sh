@@ -10,8 +10,8 @@ __fcd_add() {
   local lp_path="${lp_input#*:}"
   local lp_adj_path="${lp_path/#\~/$HOME}"
 
-  # Check if label has more than 10 characters
-  if [[ "${#lp_label}" -gt 10 ]]; then
+  # Check if label has more than 25 characters
+  if [[ "${#lp_label}" -gt 25 ]]; then
     echo "Error: Max character length of label exceeded"
     return 1
   fi
