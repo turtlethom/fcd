@@ -20,7 +20,6 @@ fcd() {
 
   # Handle no args provided (MAIN FUNCTIONALITY with fzf)
   if [[ $# -eq 0 ]]; then
-    echo "[DEBUG]: Using fcd"
     __fcd_fzf "$FCD_FILE"
     return
   fi
@@ -52,7 +51,7 @@ fcd() {
         ;;
       # <--- CLEAR ALL BOOKMARKS FROM '.fcd.txt' ---> #
       -c)
-        check_flag_used "$current_flag" "$flag_error_message" || return 1
+        __check_flag_used "$current_flag" "$flag_error_message" || return 1
         current_flag="-c"
         __fcd_clear "$FCD_FILE"
         shift
