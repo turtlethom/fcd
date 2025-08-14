@@ -10,6 +10,7 @@ source "$ROOT_DIR/lib/fcd_print.sh"
 source "$ROOT_DIR/lib/fcd_add.sh"
 source "$ROOT_DIR/lib/fcd_clear.sh"
 source "$ROOT_DIR/lib/fcd_remove.sh"
+source "$ROOT_DIR/lib/fcd_bookmark.sh"
 source "$ROOT_DIR/lib/utils.sh"
 
 fcd() {
@@ -74,7 +75,14 @@ fcd() {
         __fcd_remove "$FCD_FILE" "$current_flag_val" || return 1
         shift 2
         ;;
-      # <--- USE FZF TO SEARCH BOOKMARKS ---> #
+      -b)
+        __check_flag_used "$current_flag" "$flag_error_message" || return 1
+        __check_flag_arg "$2" "-b" || return 1
+        current_flag="-b"
+        current_flag_val="$2"
+        __fcd_bookmark "$FCD_FILE" "$current_flag_val"
+        shift 2
+        ;;
       *)
         echo "Unknown argument: '$1'" >&2
         return 1
