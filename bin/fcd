@@ -4,14 +4,14 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 FCD_FILE="$ROOT_DIR/.fcd.txt"
 
-source "$ROOT_DIR/lib/fcd_fzf.sh"
-source "$ROOT_DIR/lib/fcd_help.sh"
-source "$ROOT_DIR/lib/fcd_print.sh"
-source "$ROOT_DIR/lib/fcd_add.sh"
-source "$ROOT_DIR/lib/fcd_clear.sh"
-source "$ROOT_DIR/lib/fcd_remove.sh"
-source "$ROOT_DIR/lib/fcd_bookmark.sh"
-source "$ROOT_DIR/lib/utils.sh"
+. "$ROOT_DIR/lib/fcd_fzf.sh"
+. "$ROOT_DIR/lib/fcd_help.sh"
+. "$ROOT_DIR/lib/fcd_print.sh"
+. "$ROOT_DIR/lib/fcd_add.sh"
+. "$ROOT_DIR/lib/fcd_clear.sh"
+. "$ROOT_DIR/lib/fcd_remove.sh"
+. "$ROOT_DIR/lib/fcd_bookmark.sh"
+. "$ROOT_DIR/lib/utils.sh"
 
 fcd() {
   # If file doesn't exist, create it
@@ -90,3 +90,7 @@ fcd() {
       esac
     done
 }
+# If the script is being executed directly, run the function
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+    fcd "$@"
+fi
