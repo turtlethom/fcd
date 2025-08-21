@@ -1,9 +1,8 @@
-package internal
+package ui
 
 import (
 	"log"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/turtlethom/fcd/internal/ui"
 )
 
 func InitMenu() {

@@ -1,23 +1,14 @@
-package internal
+package cmd
 
 import (
 	"flag"
 	"fmt"
+	"log"
 	"io"
-	// "strings"
 )
 
-func printUsage() {
-		fmt.Println("Usage:")
-		fmt.Println("  fcd -a <PATH>        Add a shortcut")
-		fmt.Println("  fcd -r <LABEL>       Remove a shortcut")
-		fmt.Println("  fcd -b <LABEL>       Branch to a shortcut")
-		fmt.Println("  fcd -c               Clear all shortcuts")
-		fmt.Println("  fcd -p               Print all shortcuts")
-}
-
 func FlagInit(config *Config) {
-	flag.Usage = printUsage
+	flag.Usage = HandleHelp
 	addFlag := flag.String("a", "", "Add a shortcut to a directory within $HOME")
 	removeFlag := flag.String("r", "", "Remove a shortcut from your saved shortcuts based on a LABEL")
 	branchFlag := flag.String("b", "", "Branch to a shortcut directory based on LABEL")
@@ -34,29 +25,32 @@ func FlagInit(config *Config) {
 	// Handle flags
 	switch {
 	case *addFlag != "":
-		// parts := strings.SplitN(*addFlag, ":", 2)
-		// if len(parts) != 2 {
-		// 	fmt.Println("Invalid format.")
-		// }
-		// config.Shortcuts = append(config.Shortcuts, Shortcut{
-		//
-		// })
+		if err := HandleAdd(config, addFlag); err != nil {
+			log.Fatal(err)
+		}
 		fmt.Println("Adding:", *addFlag)
 
 	case *removeFlag != "":
+		if err := HandleRemove(config, *removeFlag); err != nil {
+			log.Fatal(err)
+		}
 		fmt.Println("Removing:", *removeFlag)
 
 	case *branchFlag != "":
 		fmt.Println("Branching:", *branchFlag)
 
 	case *clearFlag:
+		if err := HandleClear(config); err != nil {
+			log.Fatal(err)
+		}
 		fmt.Println("Clearing all shortcuts...")
 
 	case *printFlag:
+		HandlePrint(config)
 		fmt.Println("Printing all shortcut directories...")
 
 	case *helpFlag:
-		printUsage()
+		HandleHelp()
 
 	default:
 		fmt.Println("Opening fcd menu...")

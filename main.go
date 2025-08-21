@@ -2,11 +2,11 @@ package main
 
 import (
 	"log"
-	"github.com/turtlethom/fcd/internal"
+	"github.com/turtlethom/fcd/internal/cmd"
 )
 
 func main() {
-	config, err := internal.HandleConfig()
+	config, err := cmd.HandleConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -14,5 +14,5 @@ func main() {
 	// for _, shortcut := range SHORTCUTS {
 	// 	fmt.Printf("%s -> %s\n", shortcut.Label, shortcut.Path)
 	// }
-	internal.FlagInit(config)
+	cmd.FlagInit(config)
 }
