@@ -53,8 +53,10 @@ func FlagInit(config *Config) {
 		HandleHelp()
 
 	default:
-		fmt.Println("Opening fcd menu...")
-		HandleMenu(config)
+		selectedPath := HandleMenu(config)
+		if selectedPath != "" {
+			fmt.Println(selectedPath)
+		}
 	}
 }
 

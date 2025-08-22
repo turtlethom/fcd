@@ -16,8 +16,6 @@ type Model struct {
 var (
 	normalBox = lipgloss.NewStyle().
 			Border(lipgloss.NormalBorder())
-		// Padding(0, 1)
-		// Margin(0, 1)
 	cursorBox = normalBox.Copy().
 			BorderForeground(lipgloss.Color("205")).
 			Bold(true)

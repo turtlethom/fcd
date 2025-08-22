@@ -1,21 +1,23 @@
 package cmd
 
 import (
-	"strings"
-	"path/filepath"
 	"fmt"
 	"log"
+	"os"
+	"path/filepath"
+	"strings"
+
 	tea "github.com/charmbracelet/bubbletea"
 )
 
 func HandleHelp() {
-		fmt.Println("Usage:")
-		fmt.Println("  fcd                  Search saved shortcuts")
-		fmt.Println("  fcd -a <PATH>        Add a shortcut")
-		fmt.Println("  fcd -r <LABEL>       Remove a shortcut")
-		fmt.Println("  fcd -b <LABEL>       Branch to a shortcut")
-		fmt.Println("  fcd -c               Clear all shortcuts")
-		fmt.Println("  fcd -p               Print all shortcuts")
+	fmt.Println("Usage:")
+	fmt.Println("  fcd                  Search saved shortcuts")
+	fmt.Println("  fcd -a <PATH>        Add a shortcut")
+	fmt.Println("  fcd -r <LABEL>       Remove a shortcut")
+	fmt.Println("  fcd -b <LABEL>       Branch to a shortcut")
+	fmt.Println("  fcd -c               Clear all shortcuts")
+	fmt.Println("  fcd -p               Print all shortcuts")
 }
 
 func HandleAdd(config *Config, addFlag *string) error {
@@ -25,7 +27,7 @@ func HandleAdd(config *Config, addFlag *string) error {
 		parts := strings.SplitN(*addFlag, ":", 2)
 		label = parts[0]
 		path = parts[1]
-	// If only "PATH" is provided
+		// If only "PATH" is provided
 	} else {
 		path = *addFlag
 		label = filepath.Base(path)
@@ -71,14 +73,23 @@ func HandlePrint(config *Config) {
 	}
 }
 
-func HandleMenu(config *Config) {
+func HandleMenu(config *Config) string {
 	model := Model{
-		Choices: config.Shortcuts,
-		Cursor: 0,
+		Choices:  config.Shortcuts,
+		Cursor:   0,
 		Selected: -1,
 	}
-	program := tea.NewProgram(model)
-	if err := program.Start(); err != nil {
+
+	program := tea.NewProgram(model, tea.WithOutput(os.Stderr))
+	finalModel, err := program.StartReturningModel()
+	if err != nil {
 		log.Fatal(err)
 	}
+
+	m := finalModel.(Model)
+
+	if m.Selected >= 0 {
+		return m.Choices[m.Selected].Path // return path without printing
+	}
+	return ""
 }
