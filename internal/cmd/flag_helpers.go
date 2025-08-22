@@ -4,10 +4,13 @@ import (
 	"strings"
 	"path/filepath"
 	"fmt"
+	"log"
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 func HandleHelp() {
 		fmt.Println("Usage:")
+		fmt.Println("  fcd                  Search saved shortcuts")
 		fmt.Println("  fcd -a <PATH>        Add a shortcut")
 		fmt.Println("  fcd -r <LABEL>       Remove a shortcut")
 		fmt.Println("  fcd -b <LABEL>       Branch to a shortcut")
@@ -65,5 +68,21 @@ func HandleClear(config *Config) error {
 func HandlePrint(config *Config) {
 	for _, sc := range config.Shortcuts {
 		fmt.Printf("%-10s %s\n", sc.Label, sc.Path)
+	}
+}
+
+func HandleMenu(config *Config) {
+	// labels, _, err := config.GetShortcutData()
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	model := Model{
+		Choices: config.Shortcuts,
+		Cursor: 0,
+		Selected: -1,
+	}
+	program := tea.NewProgram(model)
+	if err := program.Start(); err != nil {
+		log.Fatal(err)
 	}
 }
