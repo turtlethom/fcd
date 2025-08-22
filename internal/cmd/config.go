@@ -3,8 +3,8 @@ package cmd
 import (
 	"encoding/json"
 	"errors"
-	"os"
 	"fmt"
+	"os"
 	"path/filepath"
 	"github.com/turtlethom/fcd/internal/utils"
 )

@@ -10,9 +10,5 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	// for _, shortcut := range SHORTCUTS {
-	// 	fmt.Printf("%s -> %s\n", shortcut.Label, shortcut.Path)
-	// }
 	cmd.FlagInit(config)
 }

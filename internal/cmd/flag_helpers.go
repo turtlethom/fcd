@@ -72,10 +72,6 @@ func HandlePrint(config *Config) {
 }
 
 func HandleMenu(config *Config) {
-	// labels, _, err := config.GetShortcutData()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
 	model := Model{
 		Choices: config.Shortcuts,
 		Cursor: 0,
