@@ -2,12 +2,14 @@ package cmd
 
 import (
 	"fmt"
-	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/lipgloss"
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 // Core state of Bubble Tea program
 type Model struct {
+	Input		 textinput.Model
 	Cursor   int        // Current item highlighted
 	Choices  []Shortcut // Menu options
 	Selected int        // Selected option
@@ -60,11 +62,15 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 // Returns string that should be rendered to the terminal
 // Controls how UI looks based on model's state
 func (m Model) View() string {
-	s := "Main Menu\n\n"
+	title := lipgloss.NewStyle().
+		Border(lipgloss.RoundedBorder()).
+		Padding(0, 1).
+		Render("FCD - Shortcut Menu")
+	s := title + "\n\n"
 	for i, choice := range m.Choices {
-		symbol := ") " // default unselected
+		symbol := "  ) " // default unselected
 		if m.Cursor == i {
-			symbol = "*) " // hovered
+			symbol = " *) " // hovered
 		}
 		line := fmt.Sprintf("%s%s", symbol, choice.Label)
 		// Show path only if hovered

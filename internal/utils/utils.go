@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 )
+
 func IsInsideHome(path string) (string, error) {
 	// Expand ~ if present
 	if strings.HasPrefix(path, "~") {

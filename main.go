@@ -10,5 +10,5 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	cmd.FlagInit(config)
+	cmd.HandleFlags(config)
 }

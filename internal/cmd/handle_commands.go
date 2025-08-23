@@ -7,7 +7,7 @@ import (
 	"io"
 )
 
-func FlagInit(config *Config) {
+func HandleFlags(config *Config) {
 	flag.Usage = HandleHelp
 	addFlag := flag.String("a", "", "Add a shortcut to a directory within $HOME")
 	removeFlag := flag.String("r", "", "Remove a shortcut from your saved shortcuts based on a LABEL")
