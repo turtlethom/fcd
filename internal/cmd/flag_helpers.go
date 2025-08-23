@@ -37,9 +37,6 @@ func HandleAdd(config *Config, addFlag *string) error {
 	if err := config.AddShortcut(label, path); err != nil {
 		return err
 	}
-	// DEBUG
-	fmt.Println("Added Label: ", label)
-	fmt.Println("Added Path:", path)
 	return Save(config)
 }
 

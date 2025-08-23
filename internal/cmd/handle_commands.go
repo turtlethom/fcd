@@ -49,8 +49,8 @@ func HandleFlags(config *Config) {
 		fmt.Fprintln(os.Stderr, "Successfully cleared all shortcuts")
 
 	case *printFlag:
-		HandlePrint(config)
 		fmt.Fprintln(os.Stderr, "Printing all shortcut directories...")
+		HandlePrint(config)
 
 	case *helpFlag:
 		HandleHelp()
