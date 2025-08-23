@@ -2,14 +2,12 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/lipgloss"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
 // Core state of Bubble Tea program
 type Model struct {
-	Input		 textinput.Model
 	Cursor   int        // Current item highlighted
 	Choices  []Shortcut // Menu options
 	Selected int        // Selected option
