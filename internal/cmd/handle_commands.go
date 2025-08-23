@@ -3,8 +3,8 @@ package cmd
 import (
 	"flag"
 	"fmt"
-	"log"
 	"io"
+	"os"
 )
 
 func HandleFlags(config *Config) {
@@ -26,28 +26,31 @@ func HandleFlags(config *Config) {
 	switch {
 	case *addFlag != "":
 		if err := HandleAdd(config, addFlag); err != nil {
-			log.Fatal(err)
+			fmt.Fprintln(os.Stderr, "Error adding shortcut:", err)
+			os.Exit(1)
 		}
-		fmt.Println("Adding:", *addFlag)
+		fmt.Fprintln(os.Stderr, "Successfully added:", *addFlag)
 
 	case *removeFlag != "":
 		if err := HandleRemove(config, *removeFlag); err != nil {
-			log.Fatal(err)
+			fmt.Fprintln(os.Stderr, "Error removing shortcut:", err)
+			os.Exit(1)
 		}
-		fmt.Println("Removing:", *removeFlag)
+		fmt.Fprintln(os.Stderr, "Successfully removed:", *removeFlag)
 
 	case *branchFlag != "":
-		fmt.Println("Branching:", *branchFlag)
+		fmt.Fprintln(os.Stderr, "Successful branch:")
 
 	case *clearFlag:
 		if err := HandleClear(config); err != nil {
-			log.Fatal(err)
+			fmt.Fprintln(os.Stderr, "Error clearing shortcuts:", err)
+			os.Exit(1)
 		}
-		fmt.Println("Clearing all shortcuts...")
+		fmt.Fprintln(os.Stderr, "Successfully cleared all shortcuts")
 
 	case *printFlag:
 		HandlePrint(config)
-		fmt.Println("Printing all shortcut directories...")
+		fmt.Fprintln(os.Stderr, "Printing all shortcut directories...")
 
 	case *helpFlag:
 		HandleHelp()

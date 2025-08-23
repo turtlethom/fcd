@@ -11,13 +11,13 @@ import (
 )
 
 func HandleHelp() {
-	fmt.Println("Usage:")
-	fmt.Println("  fcd                  Search saved shortcuts")
-	fmt.Println("  fcd -a <PATH>        Add a shortcut")
-	fmt.Println("  fcd -r <LABEL>       Remove a shortcut")
-	fmt.Println("  fcd -b <LABEL>       Branch to a shortcut")
-	fmt.Println("  fcd -c               Clear all shortcuts")
-	fmt.Println("  fcd -p               Print all shortcuts")
+	fmt.Fprintln(os.Stderr, "Usage:")
+	fmt.Fprintln(os.Stderr, "  fcd                  Search saved shortcuts")
+	fmt.Fprintln(os.Stderr, "  fcd -a <PATH>        Add a shortcut")
+	fmt.Fprintln(os.Stderr, "  fcd -r <LABEL>       Remove a shortcut")
+	fmt.Fprintln(os.Stderr, "  fcd -b <LABEL>       Branch to a shortcut")
+	fmt.Fprintln(os.Stderr, "  fcd -c               Clear all shortcuts")
+	fmt.Fprintln(os.Stderr, "  fcd -p               Print all shortcuts")
 }
 
 func HandleAdd(config *Config, addFlag *string) error {
@@ -69,7 +69,7 @@ func HandleClear(config *Config) error {
 
 func HandlePrint(config *Config) {
 	for _, sc := range config.Shortcuts {
-		fmt.Printf("%-10s %s\n", sc.Label, sc.Path)
+		fmt.Fprintf(os.Stderr, "%-10s %s\n", sc.Label, sc.Path)
 	}
 }
 
