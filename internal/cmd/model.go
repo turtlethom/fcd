@@ -10,6 +10,7 @@ type Model struct {
 	Cursor   int        // Current item highlighted
 	Choices  []Shortcut // Menu options
 	Selected int        // Selected option
+	Styles   Styles			// Styles rendered to Stderr
 }
 
 var (

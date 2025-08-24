@@ -75,18 +75,23 @@ func HandleMenu(config *Config) string {
 		Choices:  config.Shortcuts,
 		Cursor:   0,
 		Selected: -1,
+		Styles:   NewStylesForStderr(), // inject styles here
 	}
 
-	program := tea.NewProgram(model, tea.WithOutput(os.Stderr))
+	program := tea.NewProgram(
+		model,
+		tea.WithOutput(os.Stderr),
+		tea.WithAltScreen(),
+	)
+
 	finalModel, err := program.StartReturningModel()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	m := finalModel.(Model)
-
 	if m.Selected >= 0 {
-		return m.Choices[m.Selected].Path // return path without printing
+		return m.Choices[m.Selected].Path
 	}
 	return ""
 }

@@ -2,55 +2,33 @@ package cmd
 
 import (
 	"fmt"
-
-	"github.com/charmbracelet/lipgloss"
+	"strings"
 )
 
 func (m Model) RenderTitle() string {
-	title := lipgloss.NewStyle().
-		Border(lipgloss.RoundedBorder()).
-		Padding(0, 1).
-		Render("FCD - Shortcut Menu")
-	return title + "\n\n"
+	return m.Styles.Title.Render("FCD - Shortcut Menu") + "\n\n"
 }
 
 func (m Model) RenderChoices() string {
-	var out string
+	var output strings.Builder
 	for i, choice := range m.Choices {
-		// Symbol for hovered/unhovered
+		// NORMAL CURSOR SYMBOL
 		symbol := "  ) "
+		style := m.Styles.NormalLabel
 		if m.Cursor == i {
+			// ACTIVE CURSOR SYMBOL
 			symbol = " *) "
+			style = m.Styles.ActiveLabel
 		}
-
-		// Style for the label (highlighted if hovered)
-		labelStyle := lipgloss.NewStyle().
-			// Padding(0, 1).
-			Bold(true)
+		// RENDER LABEL
+		label := style.Render(fmt.Sprintf("[ %s ]", choice.Label))
+		line := fmt.Sprintf("%s%s", symbol, label)
 		if m.Cursor == i {
-			labelStyle = labelStyle.
-				// Background(lipgloss.Color("62")).  // teal label background
-				Background(lipgloss.Color("38")).  // blue label background
-				Foreground(lipgloss.Color("230")) // bright label text
-		} else {
-			labelStyle = labelStyle.Foreground(lipgloss.Color("250")) // dim label text
+			line += fmt.Sprintf(" → %s", m.Styles.Path.Render(choice.Path))
 		}
-
-		// Render label with brackets
-		renderedLabel := labelStyle.Render(fmt.Sprintf("[ %s ]", choice.Label))
-
-		// Style for path (always dim)
-		pathStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("240"))
-
-		// Combine symbol + label + optional path
-		line := fmt.Sprintf("%s%s", symbol, renderedLabel)
-		if m.Cursor == i {
-			line += fmt.Sprintf(" → %s", pathStyle.Render(choice.Path))
-		}
-
-		out += line + "\n"
+		fmt.Fprintln(&output, line)
 	}
-	return out
+	return output.String()
 }
 
 func (m Model) RenderHelp() string {
