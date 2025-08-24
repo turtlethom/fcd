@@ -77,7 +77,7 @@ func HandleMenu(config *Config) string {
 		Selected: -1,
 	}
 
-	program := tea.NewProgram(model, tea.WithAltScreen())
+	program := tea.NewProgram(model, tea.WithOutput(os.Stderr))
 	finalModel, err := program.StartReturningModel()
 	if err != nil {
 		log.Fatal(err)
