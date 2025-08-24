@@ -33,7 +33,7 @@ SHARE_DIR="$HOME/.local/share/fcd"
 mkdir -p "$SHARE_DIR"
 
 # Bash/Zsh wrapper
-cat > "$SHARE_DIR/fcd.sh" <<'EOF'
+cat >"$SHARE_DIR/fcd.sh" <<'EOF'
 fcd() {
   target=$("$HOME/.local/bin/fcd" "$@")
   if [ -n "$target" ]; then
@@ -43,7 +43,7 @@ fcd() {
 EOF
 
 # Fish wrapper
-cat > "$SHARE_DIR/fcd.fish" <<'EOF'
+cat >"$SHARE_DIR/fcd.fish" <<'EOF'
 function fcd
     set target (~/.local/bin/fcd $argv)
     if test -n "$target"
@@ -59,22 +59,22 @@ SHELL_NAME=$(basename "$SHELL")
 RC_FILE=""
 
 case "$SHELL_NAME" in
-  bash)
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-      RC_FILE="$HOME/.bash_profile"
-    else
-      RC_FILE="$HOME/.bashrc"
-    fi
-    ;;
-  zsh)
-    RC_FILE="$HOME/.zshrc"
-    ;;
-  fish)
-    RC_FILE="$HOME/.config/fish/config.fish"
-    ;;
-  *)
-    RC_FILE="$HOME/.profile"
-    ;;
+bash)
+	if [[ "$OSTYPE" == "darwin"* ]]; then
+		RC_FILE="$HOME/.bash_profile"
+	else
+		RC_FILE="$HOME/.bashrc"
+	fi
+	;;
+zsh)
+	RC_FILE="$HOME/.zshrc"
+	;;
+fish)
+	RC_FILE="$HOME/.config/fish/config.fish"
+	;;
+*)
+	RC_FILE="$HOME/.profile"
+	;;
 esac
 
 echo "[*] Detected shell: $SHELL_NAME"
@@ -84,16 +84,16 @@ echo "[*] Using RC file: $RC_FILE"
 # Add source line to RC file
 # -----------------------------
 if [ "$SHELL_NAME" = "fish" ]; then
-    INSTALL_LINE="source $SHARE_DIR/fcd.fish"
+	INSTALL_LINE="source $SHARE_DIR/fcd.fish"
 else
-    INSTALL_LINE="source $SHARE_DIR/fcd.sh"
+	INSTALL_LINE="source $SHARE_DIR/fcd.sh"
 fi
 
 if ! grep -Fxq "$INSTALL_LINE" "$RC_FILE" 2>/dev/null; then
-    echo "$INSTALL_LINE" >> "$RC_FILE"
-    echo "[*] Added FCD wrapper to $RC_FILE"
+	echo "$INSTALL_LINE" >>"$RC_FILE"
+	echo "[*] Added FCD wrapper to $RC_FILE"
 else
-    echo "[*] FCD wrapper already present in $RC_FILE"
+	echo "[*] FCD wrapper already present in $RC_FILE"
 fi
 
 # -----------------------------
@@ -101,10 +101,10 @@ fi
 # -----------------------------
 PATH_LINE='export PATH=$HOME/.local/bin:$PATH'
 if [ "$SHELL_NAME" != "fish" ]; then
-    if ! grep -Fxq "$PATH_LINE" "$RC_FILE" 2>/dev/null; then
-        echo "$PATH_LINE" >> "$RC_FILE"
-        echo "[*] Added ~/.local/bin to PATH in $RC_FILE"
-    fi
+	if ! grep -Fxq "$PATH_LINE" "$RC_FILE" 2>/dev/null; then
+		echo "$PATH_LINE" >>"$RC_FILE"
+		echo "[*] Added ~/.local/bin to PATH in $RC_FILE"
+	fi
 fi
 
 # -----------------------------

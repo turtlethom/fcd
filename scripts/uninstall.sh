@@ -1,98 +1,68 @@
 #!/usr/bin/env bash
-#<-- UNIVERSAL UNINSTALL SCRIPT FOR FCD -->#
 set -e
 
 echo "[*] Starting FCD uninstallation..."
 
-# -----------------------------
-# Determine shell and RC file
-# -----------------------------
-SHELL_NAME=$(basename "$SHELL")
-RC_FILE=""
-
-case "$SHELL_NAME" in
-  bash)
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-      RC_FILE="$HOME/.bash_profile"
-    else
-      RC_FILE="$HOME/.bashrc"
-    fi
-    ;;
-  zsh)
-    RC_FILE="$HOME/.zshrc"
-    ;;
-  fish)
-    RC_FILE="$HOME/.config/fish/config.fish"
-    ;;
-  *)
-    RC_FILE="$HOME/.profile"
-    ;;
-esac
-
-echo "[*] Detected shell: $SHELL_NAME"
-echo "[*] Using RC file: $RC_FILE"
+SHARE_DIR="$HOME/.local/share/fcd"
+BINARY="$HOME/.local/bin/fcd"
 
 # -----------------------------
 # Remove binary
 # -----------------------------
-BINARY="$HOME/.local/bin/fcd"
 if [ -f "$BINARY" ]; then
-    rm -f "$BINARY"
-    echo "[*] Removed binary: $BINARY"
+  rm -f "$BINARY"
+  echo "[*] Removed binary: $BINARY"
 else
-    echo "[*] Binary not found, skipping."
+  echo "[*] Binary not found, skipping."
 fi
 
 # -----------------------------
-# Remove shell wrapper
+# Remove all shell wrappers
 # -----------------------------
-SHARE_DIR="$HOME/.local/share/fcd"
-
-if [ "$SHELL_NAME" = "fish" ]; then
-    WRAPPER="$SHARE_DIR/fcd.fish"
-else
-    WRAPPER="$SHARE_DIR/fcd.sh"
-fi
-
-if [ -f "$WRAPPER" ]; then
-    rm -f "$WRAPPER"
-    echo "[*] Removed wrapper: $WRAPPER"
-else
-    echo "[*] Wrapper not found, skipping."
-fi
+for wrapper in "$SHARE_DIR/fcd.sh" "$SHARE_DIR/fcd.fish"; do
+  if [ -f "$wrapper" ]; then
+    rm -f "$wrapper"
+    echo "[*] Removed wrapper: $wrapper"
+  fi
+done
 
 # -----------------------------
-# Remove source line from RC file
+# Remove source lines from all RC files
 # -----------------------------
-if [ -f "$RC_FILE" ]; then
-    if [ "$SHELL_NAME" = "fish" ]; then
-        INSTALL_LINE="source $SHARE_DIR/fcd.fish"
-    else
-        INSTALL_LINE="source $SHARE_DIR/fcd.sh"
-    fi
+RC_FILES=(
+  "$HOME/.bashrc"
+  "$HOME/.bash_profile"
+  "$HOME/.zshrc"
+  "$HOME/.profile"
+  "$HOME/.config/fish/config.fish"
+)
 
-    # Remove exact matching line
-    sed -i.bak "/$(echo "$INSTALL_LINE" | sed 's/[\/&]/\\&/g')/d" "$RC_FILE"
-    echo "[*] Removed source line from $RC_FILE (backup saved as $RC_FILE.bak)"
-else
-    echo "[*] RC file not found, skipping."
-fi
-
-# -----------------------------
-# Optional: remove PATH line
-# -----------------------------
-if [ "$SHELL_NAME" != "fish" ] && [ -f "$RC_FILE" ]; then
-    PATH_LINE='export PATH=$HOME/.local/bin:$PATH'
-    sed -i.bak "/$(echo "$PATH_LINE" | sed 's/[\/&]/\\&/g')/d" "$RC_FILE"
-    echo "[*] Removed PATH line from $RC_FILE (backup saved as $RC_FILE.bak)"
-fi
+for rc in "${RC_FILES[@]}"; do
+  if [ -f "$rc" ]; then
+    # Remove lines containing 'fcd.sh' or 'fcd.fish'
+    sed -i.bak '/fcd\.sh/d' "$rc" || true
+    sed -i.bak '/fcd\.fish/d' "$rc" || true
+    echo "[*] Removed FCD source lines from $rc (backup saved as $rc.bak)"
+  fi
+done
 
 # -----------------------------
 # Cleanup share directory if empty
 # -----------------------------
 if [ -d "$SHARE_DIR" ] && [ -z "$(ls -A "$SHARE_DIR")" ]; then
-    rmdir "$SHARE_DIR"
-    echo "[*] Removed empty share directory: $SHARE_DIR"
+  rmdir "$SHARE_DIR"
+  echo "[*] Removed empty share directory: $SHARE_DIR"
+fi
+
+# -----------------------------
+# Remove config directory (~/.config/fcd)
+# -----------------------------
+CONFIG_DIR="$HOME/.config/fcd"
+if [ -d "$CONFIG_DIR" ]; then
+  rm -rf "$CONFIG_DIR"
+  echo "[*] Removed config directory: $CONFIG_DIR"
+else
+  echo "[ ] Config directory not found, skipping: $CONFIG_DIR"
 fi
 
 echo "[*] FCD uninstallation complete!"
