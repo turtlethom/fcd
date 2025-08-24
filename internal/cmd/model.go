@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"github.com/charmbracelet/lipgloss"
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -60,25 +59,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 // Returns string that should be rendered to the terminal
 // Controls how UI looks based on model's state
 func (m Model) View() string {
-	title := lipgloss.NewStyle().
-		Border(lipgloss.RoundedBorder()).
-		Padding(0, 1).
-		Render("FCD - Shortcut Menu")
-	s := title + "\n\n"
-	for i, choice := range m.Choices {
-		symbol := "  ) " // default unselected
-		if m.Cursor == i {
-			symbol = " *) " // hovered
-		}
-		line := fmt.Sprintf("%s%s", symbol, choice.Label)
-		// Show path only if hovered
-		if m.Cursor == i {
-			pathStyle := lipgloss.NewStyle().
-				Foreground(lipgloss.Color("240"))
-			line += fmt.Sprintf(" → %s", pathStyle.Render(choice.Path))
-		}
-		s += line + "\n"
-	}
-	s += "\n(j/k) to move, Enter to select, q to quit.\n"
+	s := m.RenderTitle()
+	s += m.RenderChoices() + "\n"
+	s += m.RenderHelp()
 	return s
 }
