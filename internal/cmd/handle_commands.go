@@ -26,36 +26,50 @@ func HandleFlags(config *Config) {
 	switch {
 	case *addFlag != "":
 		if err := HandleAdd(config, addFlag); err != nil {
-			fmt.Fprintln(os.Stderr, "Error adding shortcut:", err)
+			fmt.Fprintln(os.Stderr, "fcd: Error adding shortcut:", err)
 			os.Exit(1)
 		}
-		fmt.Fprintln(os.Stderr, "Successfully added:", *addFlag)
+		fmt.Fprintln(os.Stderr, "fcd: Saved shortcut '", *addFlag, "'")
 
 	case *removeFlag != "":
 		if err := HandleRemove(config, *removeFlag); err != nil {
-			fmt.Fprintln(os.Stderr, "Error removing shortcut:", err)
+			fmt.Fprintln(os.Stderr, "fcd: Error removing shortcut:", err)
 			os.Exit(1)
 		}
-		fmt.Fprintln(os.Stderr, "Successfully removed:", *removeFlag)
+		fmt.Fprintln(os.Stderr, "fcd: Successfully removed '", *removeFlag, "'")
 
+	// TODO: Allow to change/branch into a selected directory based on LABEL
 	case *branchFlag != "":
-		fmt.Fprintln(os.Stderr, "Successful branch:")
+		fmt.Fprintln(os.Stderr, "fcd: Successful branch: '", *branchFlag, "'")
 
 	case *clearFlag:
 		if err := HandleClear(config); err != nil {
-			fmt.Fprintln(os.Stderr, "Error clearing shortcuts:", err)
+			fmt.Fprintln(os.Stderr, "fcd: Error clearing shortcuts:", err)
 			os.Exit(1)
 		}
-		fmt.Fprintln(os.Stderr, "Successfully cleared all shortcuts")
+		fmt.Fprintln(os.Stderr, "fcd: Successfully cleared all shortcuts")
 
+	// Print all saved shortcuts from user
 	case *printFlag:
-		fmt.Fprintln(os.Stderr, "Printing all shortcut directories...")
+		// If no added shortcuts, exit
+		if len(config.Shortcuts) <= 0 {
+			fmt.Fprintln(os.Stderr, "fcd: No existing shortcuts")
+			os.Exit(1)
+		}
+		fmt.Fprintln(os.Stderr, "fcd: Printing all shortcut directories...")
 		HandlePrint(config)
 
+	// Fcd help page
 	case *helpFlag:
 		HandleHelp()
 
 	default:
+		// If no added shortcuts, exit
+		if len(config.Shortcuts) <= 0 {
+			fmt.Fprintln(os.Stderr, "fcd: No existing shortcuts")
+			os.Exit(1)
+		}
+		// Grabbing path for handling flags
 		selectedPath := HandleMenu(config)
 		if selectedPath != "" {
 			fmt.Println(selectedPath)

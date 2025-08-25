@@ -11,6 +11,10 @@ import (
 )
 
 func HandleHelp() {
+	fmt.Fprintln(os.Stderr, "fcd - fast change directory")
+	fmt.Fprintln(os.Stderr, "  - Change into bookmarked directories using custom labels")
+	fmt.Fprintln(os.Stderr, "  - Limited to directories within a user's home directory")
+	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Usage:")
 	fmt.Fprintln(os.Stderr, "  fcd                  Search saved shortcuts")
 	fmt.Fprintln(os.Stderr, "  fcd -a <PATH>        Add a shortcut")
@@ -22,7 +26,7 @@ func HandleHelp() {
 
 func HandleAdd(config *Config, addFlag *string) error {
 	var label, path string
-	// If arg value is "LABEL:PATH"
+	// If arg value has "LABEL:PATH"
 	if strings.Contains(*addFlag, ":") {
 		parts := strings.SplitN(*addFlag, ":", 2)
 		label = parts[0]
@@ -53,7 +57,7 @@ func HandleRemove(config *Config, removeFlag string) error {
 		newShortcuts = append(newShortcuts, sc)
 	}
 	if !found {
-		return fmt.Errorf("no shortcut found with label %q", removeLabel)
+		return fmt.Errorf("fcd: no shortcut found with label %q", removeLabel)
 	}
 	config.Shortcuts = newShortcuts
 	return Save(config)
@@ -75,7 +79,7 @@ func HandleMenu(config *Config) string {
 		Choices:  config.Shortcuts,
 		Cursor:   0,
 		Selected: -1,
-		Styles:   NewStylesForStderr(), // inject styles here
+		Styles:   NewStylesForStderr(),
 	}
 
 	program := tea.NewProgram(

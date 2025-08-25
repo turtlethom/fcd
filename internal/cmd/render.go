@@ -6,7 +6,7 @@ import (
 )
 
 func (m Model) RenderTitle() string {
-	return m.Styles.Title.Render("FCD - Shortcut Menu") + "\n\n"
+	return m.Styles.Title.Render("FCD - [ Choose a shortcut ]:") + "\n"
 }
 
 func (m Model) RenderChoices() string {
