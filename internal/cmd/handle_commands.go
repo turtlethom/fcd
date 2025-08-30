@@ -8,26 +8,12 @@ import (
 func HandleSubcommands(config *Config) {
 	/* os.Args = {"fcd", command, commandArg} */
 	userArguments := os.Args
-	var command string
-	var commandArg string
-	// If no added shortcuts, exit
-	if len(config.Shortcuts) == 0 {
-		fmt.Fprintln(os.Stderr, "fcd: No existing shortcuts")
-		os.Exit(1)
-	}
-
-	// RETURNING OUTPUT FROM FCD MENU
-	if len(userArguments) == 1 {
-		selectedPath := HandleMenu(config)
-		if selectedPath != "" {
-			fmt.Println(selectedPath)
-		}
-	}
+	var command string = ""
+	var commandArg string = ""
 
 	// No arg command initialization
 	if len(userArguments) == 2 {
 		command = userArguments[1]
-		commandArg = ""
 	}
 
 	// Single arg command initialization
@@ -80,5 +66,22 @@ func HandleSubcommands(config *Config) {
 		{
 			HandleHelp()
 		}
+	case "":
+		{
+			// If no added shortcuts, exit
+			if len(config.Shortcuts) == 0 {
+				fmt.Fprintln(os.Stderr, "fcd: No existing shortcuts")
+				os.Exit(1)
+			}
+
+			// RETURNING OUTPUT FROM FCD MENU
+			if len(userArguments) == 1 {
+				selectedPath := HandleMenu(config)
+				if selectedPath != "" {
+					fmt.Println(selectedPath)
+				}
+			}
+		}
 	}
+
 }
