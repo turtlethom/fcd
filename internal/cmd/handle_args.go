@@ -16,24 +16,24 @@ func HandleHelp() {
 	fmt.Fprintln(os.Stderr, "  - Limited to directories within a user's home directory")
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Usage:")
-	fmt.Fprintln(os.Stderr, "  fcd                  Search saved shortcuts")
-	fmt.Fprintln(os.Stderr, "  fcd -a <PATH>        Add a shortcut")
-	fmt.Fprintln(os.Stderr, "  fcd -r <LABEL>       Remove a shortcut")
-	fmt.Fprintln(os.Stderr, "  fcd -b <LABEL>       Branch to a shortcut")
-	fmt.Fprintln(os.Stderr, "  fcd -c               Clear all shortcuts")
-	fmt.Fprintln(os.Stderr, "  fcd -p               Print all shortcuts")
+	fmt.Fprintln(os.Stderr, "  fcd                   Search saved shortcuts")
+	fmt.Fprintln(os.Stderr, "  fcd add <PATH>        Add a shortcut")
+	fmt.Fprintln(os.Stderr, "  fcd remove <LABEL>    Remove a shortcut")
+	fmt.Fprintln(os.Stderr, "  fcd branch <LABEL>    Branch to a shortcut")
+	fmt.Fprintln(os.Stderr, "  fcd clear             Clear all shortcuts")
+	fmt.Fprintln(os.Stderr, "  fcd print             Print all shortcuts")
 }
 
-func HandleAdd(config *Config, addFlag *string) error {
+func HandleAdd(config *Config, commandArg string) error {
 	var label, path string
 	// If arg value has "LABEL:PATH"
-	if strings.Contains(*addFlag, ":") {
-		parts := strings.SplitN(*addFlag, ":", 2)
+	if strings.Contains(commandArg, ":") {
+		parts := strings.SplitN(commandArg, ":", 2)
 		label = parts[0]
 		path = parts[1]
 		// If only "PATH" is provided
 	} else {
-		path = *addFlag
+		path = commandArg 
 		label = filepath.Base(path)
 	}
 
@@ -45,8 +45,8 @@ func HandleAdd(config *Config, addFlag *string) error {
 }
 
 // Removes file based on provided label
-func HandleRemove(config *Config, removeFlag string) error {
-	removeLabel := strings.ToUpper(strings.TrimSpace(removeFlag))
+func HandleRemove(config *Config, commandArg string) error {
+	removeLabel := strings.ToUpper(strings.TrimSpace(commandArg))
 	newShortcuts := make([]Shortcut, 0, len(config.Shortcuts))
 	found := false
 	for _, sc := range config.Shortcuts {

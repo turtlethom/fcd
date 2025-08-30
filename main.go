@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+
 	"github.com/turtlethom/fcd/internal/cmd"
 )
 
@@ -10,5 +11,5 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	cmd.HandleFlags(config)
+	cmd.HandleSubcommands(config)
 }
