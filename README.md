@@ -8,7 +8,7 @@ fcd currently supports **only directories located inside your `$HOME`**. Bookmar
 
 | Command | Description |
 |---------|-------------|
-| `fcd` | Launch the `fzf` menu to explore and jump to bookmarked directories. |
+| `fcd` | Launch the `bubbletea` menu to explore and jump to bookmarked directories. |
 | `fcd branch <LABEL>` | **(IN PROGRESS)** Jump directly to a bookmarked directory by its label. |
 | `fcd add <PATH>` or `fcd add <LABEL:PATH>` | Add a new bookmark. If only a path is given, the label is automatically set to the folder name. All paths must be prefixed with `~/`|
 | `fcd remove <LABEL>` | Remove a bookmark by its label. |
@@ -20,6 +20,9 @@ fcd currently supports **only directories located inside your `$HOME`**. Bookmar
 ### 💡 Examples
 
 ```bash
+fcd
+# → Opens interactive menu to saved shortcuts 
+
 fcd add ~/projects/myapp
 # → Adds a bookmark to '~/projects/myapp' labeled "MYAPP"
 
@@ -27,13 +30,16 @@ fcd add "JOB:~/work"
 # → Adds a bookmark to '~/work' labeled "JOB"
 
 fcd remove nvim
-# → Removes a bookmark labeled "NVIM" (case insensitive)
+# → Removes a bookmark labeled "NVIM" (case insensitive) from user configuration
+
+fcd branch BASHCONFIG
+# → Changes current working directory to the path matching "BASHCONFIG"
 
 fcd clear
 # → Clears all shortcuts from user configuration
 
 fcd print
-# → Lists all bookmarks
+# → Lists all saved bookmarks within user configuration
 ```
 ---
 ### 🛠 Compatibility Status
@@ -41,4 +47,5 @@ fcd is fully functional for the following shells:
 - **bash**
 - **zsh**
 - **fish**
+
 Support for **Windows PowerShell** is currently in progress.
