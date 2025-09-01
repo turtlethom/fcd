@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/bubbles/list"
 )
 
 func HandleHelp() {
@@ -75,27 +76,33 @@ func HandlePrint(config *Config) {
 }
 
 func HandleMenu(config *Config) string {
-	model := Model{
-		Choices:  config.Shortcuts,
-		Cursor:   0,
-		Selected: -1,
-		Styles:   NewStylesForStderr(),
-	}
+    items := make([]list.Item, len(config.Shortcuts))
+    for i, sc := range config.Shortcuts {
+        items[i] = sc
+    }
 
-	program := tea.NewProgram(
-		model,
-		tea.WithOutput(os.Stderr),
-		tea.WithAltScreen(),
-	)
+    l := list.New(items, list.NewDefaultDelegate(), 20, 10)
+    l.Title = "FCD - Shortcut Menu"
 
-	finalModel, err := program.StartReturningModel()
-	if err != nil {
-		log.Fatal(err)
-	}
+    model := Model{
+        List:   l,
+        Styles: NewStylesForStderr(),
+    }
 
-	m := finalModel.(Model)
-	if m.Selected >= 0 {
-		return m.Choices[m.Selected].Path
-	}
-	return ""
+    program := tea.NewProgram(
+        model,
+        tea.WithOutput(os.Stderr),
+        tea.WithAltScreen(),
+    )
+
+    finalModel, err := program.StartReturningModel()
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    m := finalModel.(Model)
+    if sel, ok := m.List.SelectedItem().(Shortcut); ok {
+        return sel.Path
+    }
+    return ""
 }

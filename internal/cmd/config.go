@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"github.com/charmbracelet/bubbles/list"
 	"github.com/turtlethom/fcd/internal/utils"
 )
 
@@ -19,6 +21,10 @@ type Shortcut struct {
 	Label string `json:"label"`
 	Path  string `json:"path"`
 }
+
+func (s Shortcut) Title() string       { return s.Label }
+func (s Shortcut) Description() string { return s.Path }
+func (s Shortcut) FilterValue() string { return s.Label }
 
 /*
 	Config holds all the shortcuts for a given user
@@ -117,4 +123,15 @@ func Save(config *Config) error {
 	}
 
 	return os.WriteFile(path, data, 0o644)
+}
+
+// Parse shortcuts from user config into list.Model
+func (c *Config) ToListModel() list.Model {
+	items := make([]list.Item, 0, len(c.Shortcuts))
+	for i, sc := range c.Shortcuts {
+		items[i] = sc
+	}
+	m := list.New(items, list.NewDefaultDelegate(), 0, 0)
+	m.Title = "Shortcuts"
+	return m
 }

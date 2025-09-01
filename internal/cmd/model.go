@@ -1,29 +1,19 @@
 package cmd
 
 import (
-	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
+
+var docStyle = lipgloss.NewStyle().Margin(2, 1)
 
 // Core state of Bubble Tea program
 type Model struct {
-	Cursor   int        // Current item highlighted
-	Choices  []Shortcut // Menu options
+	List     list.Model // Menu options
 	Selected int        // Selected option
-	Styles   Styles			// Styles rendered to Stderr
+	Styles   Styles
 }
-
-var (
-	normalBox = lipgloss.NewStyle().
-			Border(lipgloss.NormalBorder())
-	cursorBox = normalBox.Copy().
-			BorderForeground(lipgloss.Color("205")).
-			Bold(true)
-	selectedBox = normalBox.Copy().
-			BorderForeground(lipgloss.Color("229")).
-			Bold(true).
-			Background(lipgloss.Color("57"))
-)
 
 // Initializes Bubble Tea, can return initial commands
 func (m Model) Init() tea.Cmd {
@@ -32,36 +22,28 @@ func (m Model) Init() tea.Cmd {
 
 // Receives current model and a message, returns new model and a command
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	// Handles keyboard input
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "k":
-			if m.Cursor > 0 {
-				m.Cursor--
-			}
-		case "j":
-			if m.Cursor < len(m.Choices)-1 {
-				m.Cursor++
-			}
 		case "enter":
-			m.Selected = m.Cursor
+				m.Selected = m.List.Index()
 			return m, tea.Quit
 		case "ctrl+c", "q":
 			return m, tea.Quit
 		}
 	case tea.WindowSizeMsg:
-	case tea.MouseMsg:
+		h, v := docStyle.GetFrameSize()
+		m.List.SetSize(msg.Width-h, msg.Height-v)
 	}
-	// Default - return the unchanged model with no command
-	return m, nil
+
+	m.List, cmd = m.List.Update(msg)
+	return m, cmd
 }
 
 // Returns string that should be rendered to the terminal
 // Controls how UI looks based on model's state
 func (m Model) View() string {
-	s := m.RenderTitle()
-	s += m.RenderChoices() + "\n"
-	s += m.RenderHelp()
-	return s
+	return docStyle.Render(m.List.View())
 }
