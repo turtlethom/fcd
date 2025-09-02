@@ -2,86 +2,136 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"os"
+	"path/filepath"
+	"strings"
+
+	"github.com/charmbracelet/bubbles/list"
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
+	"github.com/muesli/termenv"
 )
 
-func HandleSubcommands(config *Config) {
-	/* os.Args = {"fcd", command, commandArg} */
-	userArguments := os.Args
-	var command string = ""
-	var commandArg string = ""
+var (
+	selectedItemStyle = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("#FF007F")). // white text
+			BorderStyle(lipgloss.NormalBorder()).
+			BorderLeft(true).
+			BorderForeground(lipgloss.Color("#FF007F")).
+			Padding(0, 1)
+	titleStyle = lipgloss.NewStyle().
+			Bold(true).
+			Padding(0, 1).
+			Foreground(lipgloss.Color("#FFFFFF")).
+			Background(lipgloss.Color("#FF007F"))
+	normalItemStyle = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("#AAAAAA")) // gray text
+)
 
-	// No arg command initialization
-	if len(userArguments) == 2 {
-		command = userArguments[1]
+func HandleHelp() {
+	fmt.Fprintln(os.Stderr, "fcd - fast change directory")
+	fmt.Fprintln(os.Stderr, "  - Change into bookmarked directories using custom labels")
+	fmt.Fprintln(os.Stderr, "  - Limited to directories within a user's home directory")
+	fmt.Fprintln(os.Stderr)
+	fmt.Fprintln(os.Stderr, "Usage:")
+	fmt.Fprintln(os.Stderr, "  fcd                   Search saved shortcuts")
+	fmt.Fprintln(os.Stderr, "  fcd add <PATH>        Add a shortcut")
+	fmt.Fprintln(os.Stderr, "  fcd remove <LABEL>    Remove a shortcut")
+	fmt.Fprintln(os.Stderr, "  fcd branch <LABEL>    Branch to a shortcut")
+	fmt.Fprintln(os.Stderr, "  fcd clear             Clear all shortcuts")
+	fmt.Fprintln(os.Stderr, "  fcd print             Print all shortcuts")
+}
+
+func HandleAdd(config *Config, commandArg string) error {
+	var label, path string
+	// If arg value has "LABEL:PATH"
+	if strings.Contains(commandArg, ":") {
+		parts := strings.SplitN(commandArg, ":", 2)
+		label = parts[0]
+		path = parts[1]
+		// If only "PATH" is provided
+	} else {
+		path = commandArg
+		label = filepath.Base(path)
 	}
 
-	// Single arg command initialization
-	if len(userArguments) == 3 {
-		command = userArguments[1]
-		commandArg = userArguments[2]
+	label = strings.ToUpper(strings.TrimSpace(label))
+	if err := config.AddShortcut(label, path); err != nil {
+		return err
+	}
+	return Save(config)
+}
+
+// Removes file based on provided label
+func HandleRemove(config *Config, commandArg string) error {
+	removeLabel := strings.ToUpper(strings.TrimSpace(commandArg))
+	newShortcuts := make([]Shortcut, 0, len(config.Shortcuts))
+	found := false
+	for _, sc := range config.Shortcuts {
+		if sc.Label == removeLabel {
+			found = true
+			continue
+		}
+		newShortcuts = append(newShortcuts, sc)
+	}
+	if !found {
+		return fmt.Errorf("fcd: no shortcut found with label %q", removeLabel)
+	}
+	config.Shortcuts = newShortcuts
+	return Save(config)
+}
+
+func HandleClear(config *Config) error {
+	config.Shortcuts = []Shortcut{}
+	return Save(config)
+}
+
+func HandlePrint(config *Config) {
+	for _, sc := range config.Shortcuts {
+		fmt.Fprintf(os.Stderr, "%-10s %s\n", sc.Label, sc.Path)
+	}
+}
+
+func HandleMenu(config *Config) string {
+	lipgloss.SetColorProfile(termenv.TrueColor)
+	items := make([]list.Item, len(config.Shortcuts))
+	for i, sc := range config.Shortcuts {
+		items[i] = sc
 	}
 
-	switch command {
-	case "add":
-		{
-			if err := HandleAdd(config, commandArg); err != nil {
-				fmt.Fprintln(os.Stderr, "fcd: Error adding shortcut:", err)
-				os.Exit(1)
-			}
-			fmt.Fprintln(os.Stderr, "fcd: Saved shortcut '", commandArg, "'")
-		}
+	delegate := list.NewDefaultDelegate()
+	// Custom Styles
+	delegate.Styles.SelectedTitle = selectedItemStyle
+	delegate.Styles.SelectedDesc = selectedItemStyle
+	delegate.Styles.NormalTitle = normalItemStyle
+	delegate.Styles.NormalDesc = normalItemStyle
 
-	case "remove":
-		{
-			if err := HandleRemove(config, commandArg); err != nil {
-				fmt.Fprintln(os.Stderr, "fcd: Error removing shortcut:", err)
-				os.Exit(1)
-			}
-			fmt.Fprintln(os.Stderr, "fcd: Successfully removed '", commandArg, "'")
-		}
-	case "branch":
-		{
-			fmt.Fprintln(os.Stderr, "fcd: Successful branch: '", commandArg, "'")
-		}
-	case "clear":
-		{
-			if err := HandleClear(config); err != nil {
-				fmt.Fprintln(os.Stderr, "fcd: Error clearing shortcuts:", err)
-				os.Exit(1)
-			}
-			fmt.Fprintln(os.Stderr, "fcd: Successfully cleared all shortcuts")
-		}
-	case "print":
-		{
-			// If no added shortcuts, exit
-			if len(config.Shortcuts) <= 0 {
-				fmt.Fprintln(os.Stderr, "fcd: No existing shortcuts")
-				os.Exit(1)
-			}
-			fmt.Fprintln(os.Stderr, "fcd: Printing all shortcut directories...")
-			HandlePrint(config)
-		}
-	case "help":
-		{
-			HandleHelp()
-		}
-	case "":
-		{
-			// If no added shortcuts, exit
-			if len(config.Shortcuts) == 0 {
-				fmt.Fprintln(os.Stderr, "fcd: No existing shortcuts")
-				os.Exit(1)
-			}
+	l := list.New(items, delegate, 0, 10)
 
-			// RETURNING OUTPUT FROM FCD MENU
-			if len(userArguments) == 1 {
-				selectedPath := HandleMenu(config)
-				if selectedPath != "" {
-					fmt.Println(selectedPath)
-				}
-			}
-		}
+	// Clear out default list title styles
+	l.Styles.Title = lipgloss.NewStyle()
+	l.Styles.TitleBar = lipgloss.NewStyle()
+	l.Title = titleStyle.Render("FCD - Shortcut Menu")
+
+	model := Model{
+		List: l,
 	}
 
+	program := tea.NewProgram(
+		model,
+		tea.WithOutput(os.Stderr),
+		tea.WithAltScreen(),
+	)
+
+	finalModel, err := program.Run()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	m := finalModel.(Model)
+	if sel, ok := m.List.SelectedItem().(Shortcut); ok {
+		return sel.Path
+	}
+	return ""
 }

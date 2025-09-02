@@ -12,7 +12,6 @@ var docStyle = lipgloss.NewStyle().Margin(2, 1)
 type Model struct {
 	List     list.Model // Menu options
 	Selected int        // Selected option
-	Styles   Styles
 }
 
 // Initializes Bubble Tea, can return initial commands
