@@ -13,22 +13,6 @@ import (
 	"github.com/muesli/termenv"
 )
 
-var (
-	selectedItemStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("#FF007F")). // white text
-			BorderStyle(lipgloss.NormalBorder()).
-			BorderLeft(true).
-			BorderForeground(lipgloss.Color("#FF007F")).
-			Padding(0, 1)
-	titleStyle = lipgloss.NewStyle().
-			Bold(true).
-			Padding(0, 1).
-			Foreground(lipgloss.Color("#FFFFFF")).
-			Background(lipgloss.Color("#FF007F"))
-	normalItemStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("#AAAAAA")) // gray text
-)
-
 func HandleHelp() {
 	fmt.Fprintln(os.Stderr, "fcd - fast change directory")
 	fmt.Fprintln(os.Stderr, "  - Change into bookmarked directories using custom labels")
@@ -94,41 +78,29 @@ func HandlePrint(config *Config) {
 }
 
 func HandleMenu(config *Config) string {
+	// Ensures ANSI colors will be rendered for both stdout and stderr
 	lipgloss.SetColorProfile(termenv.TrueColor)
+	// Creating list items based on bookmarks
 	items := make([]list.Item, len(config.Shortcuts))
 	for i, sc := range config.Shortcuts {
 		items[i] = sc
 	}
-
-	delegate := list.NewDefaultDelegate()
-	// Custom Styles
-	delegate.Styles.SelectedTitle = selectedItemStyle
-	delegate.Styles.SelectedDesc = selectedItemStyle
-	delegate.Styles.NormalTitle = normalItemStyle
-	delegate.Styles.NormalDesc = normalItemStyle
-
-	l := list.New(items, delegate, 0, 10)
-
-	// Clear out default list title styles
-	l.Styles.Title = lipgloss.NewStyle()
-	l.Styles.TitleBar = lipgloss.NewStyle()
-	l.Title = titleStyle.Render("FCD - Shortcut Menu")
-
+	bubblesList := CreateBubblesList(items)
+	// Create Model
 	model := Model{
-		List: l,
+		List: bubblesList,
 	}
-
+	// Start bubbletea for FCD menu
 	program := tea.NewProgram(
 		model,
 		tea.WithOutput(os.Stderr),
 		tea.WithAltScreen(),
 	)
-
 	finalModel, err := program.Run()
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	// Get result of user choice and return it at the end
 	m := finalModel.(Model)
 	if sel, ok := m.List.SelectedItem().(Shortcut); ok {
 		return sel.Path
