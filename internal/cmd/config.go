@@ -22,6 +22,7 @@ type Shortcut struct {
 	Path  string `json:"path"`
 }
 
+// Implementing Item interface
 func (s Shortcut) Title() string       { return s.Label }
 func (s Shortcut) Description() string { return s.Path }
 func (s Shortcut) FilterValue() string { return s.Label }
