@@ -11,28 +11,30 @@ import (
 	"github.com/turtlethom/fcd/internal/utils"
 )
 
-/*
-	A Shortcut holds the data related to an entry by the user, and is prepared
-	to be written to the user's Config:
-		- `label` is the label for the filepath
-		- `path` is the filepath within the user's home directory
-*/
 type Shortcut struct {
 	Label string `json:"label"`
 	Path  string `json:"path"`
 }
 
-// Implementing Item interface
+// Implementing Item interface for Shortcut to be added to list component
 func (s Shortcut) Title() string       { return s.Label }
 func (s Shortcut) Description() string { return s.Path }
 func (s Shortcut) FilterValue() string { return s.Label }
 
-/*
-	Config holds all the shortcuts for a given user
-		- `Shortcuts` holds all data related to the user's valid shortcuts
-*/
+/* Creating structs based on fcd_config.json */
+type Colors struct {
+	Primary		string `json:"primary"`
+	Secondary	string `json:"secondary"`
+	Tertiary  string `json:"tertiary"`
+}
+
+func (c Colors) getPrimary() string { return c.Primary }
+func (c Colors) getSecondary() string { return c.Primary }
+func (c Colors) getTertiary() string { return c.Primary }
+
 type Config struct {
-	Shortcuts []Shortcut `json:"shortcuts"`
+	Shortcuts []Shortcut 	`json:"shortcuts"`
+	Colors 		Colors 			`json:"colors"`
 }
 
 // Returns absolute path to fcd_config.json
@@ -46,7 +48,14 @@ func getConfigPath() (string, error) {
 
 // Makes a brand new config file if it doesn't exist
 func CreateConfig(path string) (*Config, error) {
-	config := &Config{Shortcuts: []Shortcut{}}
+	config := &Config{
+		Shortcuts: []Shortcut{},
+		Colors: Colors{
+				Primary: "#FF007F",
+				Secondary: "#FFFFFF",
+				Tertiary: "#000000",
+		},
+	}
 	if err := Save(config); err != nil {
 		return nil, err
 	}
@@ -63,8 +72,8 @@ func LoadConfig(path string) (*Config, error) {
 
 	var config Config
 	decoder := json.NewDecoder(f)
+	// If empty file or bad JSON → reset to empty config
 	if err := decoder.Decode(&config); err != nil {
-		// If empty file or bad JSON → reset to empty config
 		return &Config{Shortcuts: []Shortcut{}}, nil
 	}
 	return &config, nil

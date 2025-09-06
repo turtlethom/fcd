@@ -4,85 +4,113 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/lipgloss"
 )
+type Styles struct {
+	Primary   lipgloss.Color
+	Secondary lipgloss.Color
+	Tertiary  lipgloss.Color
 
-var (
-	// Colors For FCD Menu
-	// TODO: Allow configurable colors for menu
-	PRIMARY   = lipgloss.Color("#FF007F")
-	SECONDARY = lipgloss.Color("#FFFFFF")
+	NormalTitle    lipgloss.Style
+	NormalDesc     lipgloss.Style
+	SelectedTitle  lipgloss.Style
+	SelectedDesc   lipgloss.Style
+	MainTitle      lipgloss.Style
+	StatusBar      lipgloss.Style
+	StatusBarCount lipgloss.Style
+	FilterMatch    lipgloss.Style
+	FilterPrompt   lipgloss.Style
+	FilterCursor   lipgloss.Style
+}
+// PRIMARY   = lipgloss.Color("#FF007F")
+// 	PRIMARY   = lipgloss.Color("#00FFFF")
+// 	SECONDARY = lipgloss.Color("#FFFFFF")
+// 	TERTIARY = lipgloss.Color("#000000")
+func NewStyles(config *Config) Styles {
+	primary := lipgloss.Color(config.Colors.Primary)
+	secondary := lipgloss.Color(config.Colors.Secondary)
+	tertiary := lipgloss.Color(config.Colors.Tertiary)
 
-	// Styles Global To All Normal Styles
-	NORMAL_PRESETS = lipgloss.NewStyle().
-			BorderStyle(lipgloss.NormalBorder()).
-			BorderLeft(true).
-			BorderForeground(SECONDARY)
-	// Styles Global To All Selected Styles
-	SELECTED_PRESETS = lipgloss.NewStyle().
-			BorderStyle(lipgloss.NormalBorder()).
-			BorderLeft(true).
-			BorderForeground(PRIMARY)
+	NORMAL_PRESETS := lipgloss.NewStyle().
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderLeft(true).
+		BorderForeground(secondary)
 
-	// Styling For FCD Menu Title
-	mainTitleStyle = lipgloss.NewStyle().
-			Foreground(SECONDARY).
-			Background(PRIMARY).
+	SELECTED_PRESETS := lipgloss.NewStyle().
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderLeft(true).
+		BorderForeground(primary)
 
+	return Styles{
+		Primary:   primary,
+		Secondary: secondary,
+		Tertiary:  tertiary,
+		// Styling for FCD Main Menu Title
+		MainTitle: lipgloss.NewStyle().
+			Foreground(secondary).
+			Background(primary).
 			Bold(true).
-			Padding(0, 1)
-
-	// Styling For Unselected/Normal Title
-	normalTitleStyle = lipgloss.NewStyle().
+			Padding(0, 1),
+		// Styling for normal titles of items in list component
+		NormalTitle: lipgloss.NewStyle().
 			Inherit(NORMAL_PRESETS).
-
-			Foreground(PRIMARY).
-			Padding(0, 1)
-
-	// Styling For Unselected/Normal Descriptions
-	normalDescStyle = lipgloss.NewStyle().
+			Foreground(primary).
+			Padding(0, 1),
+		// Styling for normal descriptions of items in list component
+		NormalDesc: lipgloss.NewStyle().
 			Inherit(NORMAL_PRESETS).
-
-			Foreground(SECONDARY).
-			Padding(0, 1)
-
-	// Styling For Selected Title
-	selectedTitleStyle = lipgloss.NewStyle().
+			Foreground(secondary).
+			Padding(0, 1),
+		// Styling for title of selected item in list component
+		SelectedTitle: lipgloss.NewStyle().
 			Inherit(SELECTED_PRESETS).
-
-			Foreground(SECONDARY).
-			Background(PRIMARY).
+			Foreground(secondary).
+			Background(primary).
 			Padding(0, 1).
-			Bold(true)
-
-	// Styling For Selected Description
-	selectedDescStyle = lipgloss.NewStyle().
+			Bold(true),
+		// Styling for description of selected item in list component
+		SelectedDesc: lipgloss.NewStyle().
 			Inherit(SELECTED_PRESETS).
-
-			Foreground(SECONDARY).
+			Foreground(secondary).
 			Underline(true).
-			Padding(0, 1)
-)
-
+			Padding(0, 1),
+		// Styling for "Filter:"
+		StatusBar: lipgloss.NewStyle().
+			Foreground(secondary).
+			MarginBottom(1).
+			Padding(0, 1),
+		// Styling for status bar count
+		StatusBarCount: lipgloss.NewStyle().
+			Foreground(primary),
+		// Styling for matching text to filter
+		FilterMatch: lipgloss.NewStyle().
+			Foreground(secondary).
+			Underline(true),
+		FilterPrompt: lipgloss.NewStyle().
+			Foreground(primary).
+			Bold(true),
+		FilterCursor: lipgloss.NewStyle().
+			Foreground(primary).
+			Background(secondary),
+	}
+}	
 // Responsible for rendering each item in the FCD Menu
-func handleDelegate() list.DefaultDelegate {
+func newDelegate(s Styles) list.DefaultDelegate {
 	delegate := list.NewDefaultDelegate()
 	// Normal configuration
-	delegate.Styles.NormalTitle = normalTitleStyle
-	delegate.Styles.NormalDesc = normalDescStyle
+	delegate.Styles.NormalTitle = s.NormalTitle
+	delegate.Styles.NormalDesc = s.NormalDesc
 	// Selected configuration
-	delegate.Styles.SelectedTitle = selectedTitleStyle
-	delegate.Styles.SelectedDesc = selectedDescStyle
+	delegate.Styles.SelectedTitle = s.SelectedTitle
+	delegate.Styles.SelectedDesc = s.SelectedDesc
 	// Filter configuration
-	delegate.Styles.FilterMatch = lipgloss.NewStyle().
-		Foreground(SECONDARY).
-		Underline(true)
+	delegate.Styles.FilterMatch = s.FilterMatch
 
 	return delegate
 }
 
 // Create the FCD Menu with configuration
-func CreateBubblesList(items []list.Item) list.Model {
+func CreateBubblesList(items []list.Item, s Styles) list.Model {
 	// Configured view of each item
-	delegate := handleDelegate()
+	delegate := newDelegate(s)
 
 	// Instantiating a Bubbles List
 	l := list.New(items, delegate, 0, 10)
@@ -92,27 +120,16 @@ func CreateBubblesList(items []list.Item) list.Model {
 	l.Styles.TitleBar = lipgloss.NewStyle()
 
 	// Custom status bar styles
-	l.Styles.StatusBar = lipgloss.NewStyle().
-		Foreground(SECONDARY).
-		MarginBottom(1).
-		Padding(0, 1)
+	l.Styles.StatusBar = s.StatusBar
 	// Styles unfiltered items in filter menu
-	l.Styles.StatusBarActiveFilter = lipgloss.NewStyle().
-		Foreground(SECONDARY)
+	l.Styles.StatusBarActiveFilter = s.StatusBarCount
 	// Styles the right portion of items count
-	l.Styles.StatusBarFilterCount = lipgloss.NewStyle().
-		Foreground(PRIMARY)
-
+	l.Styles.StatusBarFilterCount = s.StatusBarCount
 	// Manages Styles For Filter Menu
-	l.FilterInput.PromptStyle = lipgloss.NewStyle().
-		Foreground(PRIMARY).
-		Bold(true)
-	l.FilterInput.Cursor.Style = lipgloss.NewStyle().
-		Foreground(PRIMARY).
-		Background(SECONDARY)
-
+	l.FilterInput.PromptStyle = s.FilterPrompt 
+	l.FilterInput.Cursor.Style = s.FilterCursor
 	// Manages The Title Of The List
-	l.Title = mainTitleStyle.Render("FCD - Shortcut Menu")
+	l.Title = s.MainTitle.Render("FCD - Shortcut Menu")
 
 	return l
 }

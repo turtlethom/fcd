@@ -85,7 +85,9 @@ func HandleMenu(config *Config) string {
 	for i, sc := range config.Shortcuts {
 		items[i] = sc
 	}
-	bubblesList := CreateBubblesList(items)
+	// Initialize styles
+	styles := NewStyles(config)
+	bubblesList := CreateBubblesList(items, styles)
 	// Create Model
 	model := Model{
 		List: bubblesList,
