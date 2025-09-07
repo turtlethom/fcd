@@ -29,6 +29,7 @@ func IsInsideHome(path string) (string, error) {
 		return "", err
 	}
 
+	// Grab the user's home directory
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return "", err

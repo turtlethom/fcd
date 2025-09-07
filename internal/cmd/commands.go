@@ -42,7 +42,11 @@ func HandleSubcommands(config *Config) {
 		}
 	case "branch":
 		{
-			fmt.Fprintln(os.Stderr, "fcd: Successful branch: '", commandArg, "'")
+			// fmt.Fprintln(os.Stderr, "fcd: Successful branch: '", commandArg, "'")
+			selectedBookmark := HandleBranch(config, commandArg)
+			if selectedBookmark != "" {
+				fmt.Println(selectedBookmark)
+			}
 		}
 	case "clear":
 		{

@@ -13,20 +13,7 @@ import (
 	"github.com/muesli/termenv"
 )
 
-func HandleHelp() {
-	fmt.Fprintln(os.Stderr, "fcd - fast change directory")
-	fmt.Fprintln(os.Stderr, "  - Change into bookmarked directories using custom labels")
-	fmt.Fprintln(os.Stderr, "  - Limited to directories within a user's home directory")
-	fmt.Fprintln(os.Stderr)
-	fmt.Fprintln(os.Stderr, "Usage:")
-	fmt.Fprintln(os.Stderr, "  fcd                   Search saved shortcuts")
-	fmt.Fprintln(os.Stderr, "  fcd add <PATH>        Add a shortcut")
-	fmt.Fprintln(os.Stderr, "  fcd remove <LABEL>    Remove a shortcut")
-	fmt.Fprintln(os.Stderr, "  fcd branch <LABEL>    Branch to a shortcut")
-	fmt.Fprintln(os.Stderr, "  fcd clear             Clear all shortcuts")
-	fmt.Fprintln(os.Stderr, "  fcd print             Print all shortcuts")
-}
-
+// Adds bookmarks based on provided LABEL or LABEL:PATH; restricted to $HOME
 func HandleAdd(config *Config, commandArg string) error {
 	var label, path string
 	// If arg value has "LABEL:PATH"
@@ -47,7 +34,7 @@ func HandleAdd(config *Config, commandArg string) error {
 	return Save(config)
 }
 
-// Removes file based on provided label
+// Removes file based on provided LABEL
 func HandleRemove(config *Config, commandArg string) error {
 	removeLabel := strings.ToUpper(strings.TrimSpace(commandArg))
 	newShortcuts := make([]Shortcut, 0, len(config.Shortcuts))
@@ -66,6 +53,17 @@ func HandleRemove(config *Config, commandArg string) error {
 	return Save(config)
 }
 
+// 'Branches' to the path that matches the provided LABEL
+func HandleBranch(config *Config, commandArg string) string {
+	for _, sc := range config.Shortcuts {
+		if sc.Label == strings.ToUpper(strings.TrimSpace(commandArg)) {
+			return sc.Path
+		}
+	}
+	fmt.Fprintf(os.Stderr, "fcd: Cannot find matching path for %q\n", commandArg)
+	return ""
+}
+
 func HandleClear(config *Config) error {
 	config.Shortcuts = []Shortcut{}
 	return Save(config)
@@ -75,6 +73,20 @@ func HandlePrint(config *Config) {
 	for _, sc := range config.Shortcuts {
 		fmt.Fprintf(os.Stderr, "%-10s %s\n", sc.Label, sc.Path)
 	}
+}
+
+func HandleHelp() {
+	fmt.Fprintln(os.Stderr, "fcd - fast change directory")
+	fmt.Fprintln(os.Stderr, "  - Change into bookmarked directories using custom labels")
+	fmt.Fprintln(os.Stderr, "  - Limited to directories within a user's home directory")
+	fmt.Fprintln(os.Stderr)
+	fmt.Fprintln(os.Stderr, "Usage:")
+	fmt.Fprintln(os.Stderr, "  fcd                   Search saved shortcuts")
+	fmt.Fprintln(os.Stderr, "  fcd add <PATH>        Add a shortcut")
+	fmt.Fprintln(os.Stderr, "  fcd remove <LABEL>    Remove a shortcut")
+	fmt.Fprintln(os.Stderr, "  fcd branch <LABEL>    Branch to a shortcut")
+	fmt.Fprintln(os.Stderr, "  fcd clear             Clear all shortcuts")
+	fmt.Fprintln(os.Stderr, "  fcd print             Print all shortcuts")
 }
 
 func HandleMenu(config *Config) string {
