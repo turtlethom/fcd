@@ -29,7 +29,7 @@ func HandleSubcommands(config *Config) {
 				fmt.Fprintln(os.Stderr, "fcd: Error adding shortcut:", err)
 				os.Exit(1)
 			}
-			fmt.Fprintln(os.Stderr, "fcd: Saved shortcut '", commandArg, "'")
+			fmt.Fprintf(os.Stderr, "fcd: Saved shortcut %q\n", commandArg)
 		}
 
 	case "remove":
@@ -38,7 +38,7 @@ func HandleSubcommands(config *Config) {
 				fmt.Fprintln(os.Stderr, "fcd: Error removing shortcut:", err)
 				os.Exit(1)
 			}
-			fmt.Fprintln(os.Stderr, "fcd: Successfully removed '", commandArg, "'")
+			fmt.Fprintf(os.Stderr, "fcd: Successfully removed %q\n", commandArg)
 		}
 	case "branch":
 		{

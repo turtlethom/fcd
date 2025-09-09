@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bufio"
 	"fmt"
 	"log"
 	"os"
@@ -65,8 +66,22 @@ func HandleBranch(config *Config, commandArg string) string {
 }
 
 func HandleClear(config *Config) error {
-	config.Shortcuts = []Shortcut{}
-	return Save(config)
+	reader := bufio.NewReader(os.Stdin)
+
+	fmt.Fprintf(os.Stderr, "fcd: Are you sure you want to clear all bookmarks? (y/n): ")
+	input, _ := reader.ReadString('\n')
+	input = strings.TrimSpace(input)
+	switch strings.ToLower(input) {
+	case "y":
+		config.Shortcuts = []Shortcut{}
+		return Save(config)
+	case "n":
+		fmt.Fprintf(os.Stderr, "fcd: Canceled clearing bookmarks\n")
+		return nil
+	default:
+		fmt.Fprintf(os.Stderr, "fcd: Defaulting to no - operation ceased \n")
+		return fmt.Errorf("fcd: Something went wrong")
+	}
 }
 
 func HandlePrint(config *Config) {

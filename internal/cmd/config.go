@@ -21,7 +21,7 @@ func (s Shortcut) Title() string       { return s.Label }
 func (s Shortcut) Description() string { return s.Path }
 func (s Shortcut) FilterValue() string { return s.Label }
 
-/* Creating structs based on fcd_config.json */
+/* Creating struct based on fcd_config.json */
 type Colors struct {
 	Primary		string `json:"primary"`
 	Secondary	string `json:"secondary"`
