@@ -7,19 +7,18 @@ import (
 
 func HandleSubcommands(config *Config) {
 	/* os.Args = {"fcd", command, commandArg} */
-	userArguments := os.Args
 	var command string = ""
 	var commandArg string = ""
 
 	// No arg command initialization
-	if len(userArguments) == 2 {
-		command = userArguments[1]
+	if len(os.Args) == 2 {
+		command = os.Args[1]
 	}
 
-	// Single arg command initialization
-	if len(userArguments) == 3 {
-		command = userArguments[1]
-		commandArg = userArguments[2]
+	// Multi arg command initialization
+	if len(os.Args) >= 3 {
+		command = os.Args[1]
+		commandArg = os.Args[2]
 	}
 
 	switch command {
@@ -66,6 +65,9 @@ func HandleSubcommands(config *Config) {
 			fmt.Fprintln(os.Stderr, "fcd: Printing all shortcut directories...")
 			HandlePrint(config)
 		}
+	case "setcolor": {
+		HandleSetColor(config)
+	}
 	case "help":
 		{
 			HandleHelp()
@@ -79,7 +81,7 @@ func HandleSubcommands(config *Config) {
 			}
 
 			// RETURNING OUTPUT FROM FCD MENU
-			if len(userArguments) == 1 {
+			if len(os.Args) == 1 {
 				selectedPath := HandleMenu(config)
 				if selectedPath != "" {
 					fmt.Println(selectedPath)

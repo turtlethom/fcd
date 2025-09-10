@@ -22,19 +22,15 @@ func (s Shortcut) Description() string { return s.Path }
 func (s Shortcut) FilterValue() string { return s.Label }
 
 /* Creating struct based on fcd_config.json */
-type Colors struct {
+type UserColors struct {
 	Primary		string `json:"primary"`
 	Secondary	string `json:"secondary"`
 	Tertiary  string `json:"tertiary"`
 }
 
-func (c Colors) getPrimary() string { return c.Primary }
-func (c Colors) getSecondary() string { return c.Primary }
-func (c Colors) getTertiary() string { return c.Primary }
-
 type Config struct {
-	Shortcuts []Shortcut 	`json:"shortcuts"`
-	Colors 		Colors 			`json:"colors"`
+	Shortcuts 	[]Shortcut 	`json:"shortcuts"`
+	UserColors 	UserColors 	`json:"userColors"`
 }
 
 // Returns absolute path to fcd_config.json
@@ -50,7 +46,7 @@ func getConfigPath() (string, error) {
 func CreateConfig(path string) (*Config, error) {
 	config := &Config{
 		Shortcuts: []Shortcut{},
-		Colors: Colors{
+		UserColors: UserColors{
 				Primary: "#FF007F",
 				Secondary: "#FFFFFF",
 				Tertiary: "#000000",

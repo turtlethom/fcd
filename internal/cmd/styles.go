@@ -4,6 +4,7 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/lipgloss"
 )
+
 type Styles struct {
 	Primary   lipgloss.Color
 	Secondary lipgloss.Color
@@ -25,9 +26,10 @@ type Styles struct {
 // 	SECONDARY = lipgloss.Color("#FFFFFF")
 // 	TERTIARY = lipgloss.Color("#000000")
 func NewStyles(config *Config) Styles {
-	primary := lipgloss.Color(config.Colors.Primary)
-	secondary := lipgloss.Color(config.Colors.Secondary)
-	tertiary := lipgloss.Color(config.Colors.Tertiary)
+	// Sets colors of the menu based on user configuration
+	primary := lipgloss.Color(config.UserColors.Primary)
+	secondary := lipgloss.Color(config.UserColors.Secondary)
+	tertiary := lipgloss.Color(config.UserColors.Tertiary)
 
 	NORMAL_PRESETS := lipgloss.NewStyle().
 		BorderStyle(lipgloss.NormalBorder()).

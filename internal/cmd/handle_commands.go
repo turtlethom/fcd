@@ -2,11 +2,13 @@ package cmd
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
+	"github.com/turtlethom/fcd/internal/utils"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
@@ -88,6 +90,53 @@ func HandlePrint(config *Config) {
 	for _, sc := range config.Shortcuts {
 		fmt.Fprintf(os.Stderr, "%-10s %s\n", sc.Label, sc.Path)
 	}
+}
+
+func HandleSetColor(config *Config) error {
+	// Create setcolor command
+	setColorCmd := flag.NewFlagSet("setcolor", flag.ExitOnError)
+	// Attach flags to command
+	primaryFlag := setColorCmd.String("p", "", "primary color of fcd menu")
+	secondaryFlag := setColorCmd.String("s", "", "secondary color of fcd menu")
+	tertiaryFlag := setColorCmd.String("t", "", "tertiary color of fcd menu") 
+	setColorCmd.Parse(os.Args[2:])
+	// Checking if no arguments provided to flags
+	if *primaryFlag == "" && *secondaryFlag == "" && *tertiaryFlag == "" {
+		fmt.Fprintf(os.Stderr, "fcd: No color arguments provided\n")
+		fmt.Fprintf(os.Stderr, "fcd: Use -p, -s, or -t")
+	}
+	// Checking if primary color flag has valid argument
+	if *primaryFlag != "" {
+		hexCode, err := utils.SelectColor(*primaryFlag)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "fcd: %s\n", err)
+			os.Exit(1)
+		}
+		fmt.Fprintf(os.Stderr, "fcd: Set primary to %s\n", hexCode)
+		config.UserColors.Primary = hexCode
+	}
+	// Checking if secondary color flag has valid argument
+	if *secondaryFlag != "" {
+		hexCode, err := utils.SelectColor(*secondaryFlag)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "fcd: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Fprintf(os.Stderr, "fcd: Set secondary to %v\n", hexCode)
+		config.UserColors.Secondary = hexCode
+	}
+	// Checking if tertiary color flag has valid argument
+	if *tertiaryFlag != "" {
+		hexCode, err := utils.SelectColor(*tertiaryFlag)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "fcd: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Fprintf(os.Stderr, "fcd: Set tertiary to %v\n", hexCode)
+		config.UserColors.Tertiary = hexCode
+	}
+
+	return Save(config)
 }
 
 func HandleHelp() {
