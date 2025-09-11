@@ -103,7 +103,7 @@ func HandleSetColor(config *Config) error {
 	// Checking if no arguments provided to flags
 	if *primaryFlag == "" && *secondaryFlag == "" && *tertiaryFlag == "" {
 		fmt.Fprintf(os.Stderr, "fcd: No color arguments provided\n")
-		fmt.Fprintf(os.Stderr, "fcd: Use -p, -s, or -t")
+		fmt.Fprintf(os.Stderr, "fcd: Use -p, -s, or -t\n")
 	}
 	// Checking if primary color flag has valid argument
 	if *primaryFlag != "" {
