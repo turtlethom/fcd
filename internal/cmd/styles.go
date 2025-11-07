@@ -21,10 +21,7 @@ type Styles struct {
 	FilterPrompt   lipgloss.Style
 	FilterCursor   lipgloss.Style
 }
-// PRIMARY   = lipgloss.Color("#FF007F")
-// 	PRIMARY   = lipgloss.Color("#00FFFF")
-// 	SECONDARY = lipgloss.Color("#FFFFFF")
-// 	TERTIARY = lipgloss.Color("#000000")
+
 func NewStyles(config *Config) Styles {
 	// Sets colors of the menu based on user configuration
 	primary := lipgloss.Color(config.UserColors.Primary)

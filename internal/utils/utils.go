@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 )
 
+// Checks if a given path resides within the user's $HOME directory
 func IsInsideHome(path string) (string, error) {
 	// Expand ~ if present
 	if strings.HasPrefix(path, "~") {
@@ -43,6 +44,7 @@ func IsInsideHome(path string) (string, error) {
 	return absPath, nil
 }
 
+// Helper function for color selection by the user
 func SelectColor(color string) (string, error) {
 	switch strings.ToLower(color) {
 	case "crimson":

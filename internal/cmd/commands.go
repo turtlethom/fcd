@@ -50,10 +50,11 @@ func HandleSubcommands(config *Config) {
 	case "clear":
 		{
 			if err := HandleClear(config); err != nil {
-				fmt.Fprintln(os.Stderr, "fcd: Error clearing shortcuts:", err)
+				fmt.Fprintln(os.Stderr, err)
 				os.Exit(1)
+			} else {
+				fmt.Fprintln(os.Stderr, "fcd: Successfully cleared all shortcuts")
 			}
-			fmt.Fprintln(os.Stderr, "fcd: Successfully cleared all shortcuts")
 		}
 	case "print":
 		{
@@ -65,9 +66,14 @@ func HandleSubcommands(config *Config) {
 			fmt.Fprintln(os.Stderr, "fcd: Printing all shortcut directories...")
 			HandlePrint(config)
 		}
-	case "setcolor": {
-		HandleSetColor(config)
-	}
+	case "setcolor":
+		{
+			HandleSetColor(config)
+		}
+	case "listcolors":
+		{
+			HandleListColors()
+		}
 	case "help":
 		{
 			HandleHelp()
