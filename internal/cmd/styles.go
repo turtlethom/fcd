@@ -5,6 +5,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
+// Styles holds all the styles for the bubbles/list component
 type Styles struct {
 	Primary   lipgloss.Color
 	Secondary lipgloss.Color
@@ -22,17 +23,22 @@ type Styles struct {
 	FilterCursor   lipgloss.Style
 }
 
+// NewStyles initializes the styles that are configured for bubbles/list component
+//
+// Returns a Styles struct with all initialized styles for the component
 func NewStyles(config *Config) Styles {
 	// Sets colors of the menu based on user configuration
 	primary := lipgloss.Color(config.UserColors.Primary)
 	secondary := lipgloss.Color(config.UserColors.Secondary)
 	tertiary := lipgloss.Color(config.UserColors.Tertiary)
 
+	// Styles for normal items present within bubbles/list component
 	NORMAL_PRESETS := lipgloss.NewStyle().
 		BorderStyle(lipgloss.NormalBorder()).
 		BorderLeft(true).
 		BorderForeground(secondary)
 
+	// Styles for selected items present within bubbles/list component
 	SELECTED_PRESETS := lipgloss.NewStyle().
 		BorderStyle(lipgloss.NormalBorder()).
 		BorderLeft(true).
@@ -93,6 +99,7 @@ func NewStyles(config *Config) Styles {
 }	
 // Responsible for rendering each item in the FCD Menu
 func newDelegate(s Styles) list.DefaultDelegate {
+	// Initializing a new delegate that controls how items are rendered within bubbles/list
 	delegate := list.NewDefaultDelegate()
 	// Normal configuration
 	delegate.Styles.NormalTitle = s.NormalTitle
@@ -106,29 +113,32 @@ func newDelegate(s Styles) list.DefaultDelegate {
 	return delegate
 }
 
-// Create the FCD Menu with configuration
-func CreateBubblesList(items []list.Item, s Styles) list.Model {
+// CreateBubblesList creates the FCD Menu with configuration
+//
+// The bubbles/list component is customized as defined by Shortcuts in the list,
+// as well as the Styles configured
+func CreateBubblesList(items []list.Item, styles Styles) list.Model {
 	// Configured view of each item
-	delegate := newDelegate(s)
+	delegate := newDelegate(styles)
 
-	// Instantiating a Bubbles List
-	l := list.New(items, delegate, 0, 10)
+	// Instantiating a Bubbles List with items and custom delegate
+	list := list.New(items, delegate, 0, 10)
 
 	// Clear out default list title styles
-	l.Styles.Title = lipgloss.NewStyle()
-	l.Styles.TitleBar = lipgloss.NewStyle()
+	list.Styles.Title = lipgloss.NewStyle()
+	list.Styles.TitleBar = lipgloss.NewStyle()
 
 	// Custom status bar styles
-	l.Styles.StatusBar = s.StatusBar
+	list.Styles.StatusBar = styles.StatusBar
 	// Styles unfiltered items in filter menu
-	l.Styles.StatusBarActiveFilter = s.StatusBarCount
+	list.Styles.StatusBarActiveFilter = styles.StatusBarCount
 	// Styles the right portion of items count
-	l.Styles.StatusBarFilterCount = s.StatusBarCount
+	list.Styles.StatusBarFilterCount = styles.StatusBarCount
 	// Manages Styles For Filter Menu
-	l.FilterInput.PromptStyle = s.FilterPrompt 
-	l.FilterInput.Cursor.Style = s.FilterCursor
+	list.FilterInput.PromptStyle = styles.FilterPrompt 
+	list.FilterInput.Cursor.Style = styles.FilterCursor
 	// Manages The Title Of The List
-	l.Title = s.MainTitle.Render("FCD - Shortcut Menu")
+	list.Title = styles.MainTitle.Render("FCD - Shortcut Menu")
 
-	return l
+	return list
 }

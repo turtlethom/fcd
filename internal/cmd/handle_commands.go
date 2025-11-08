@@ -16,10 +16,7 @@ import (
 	"github.com/muesli/termenv"
 )
 
-/*
-TODO: Move menu colors somewhere else
-Make err functions to avoid repetitive printf to os.Stderr
-*/
+// MENU_COLORS represents the global colors that can be applied to bubbles/list component
 var MENU_COLORS = map[string]string{
 	"crimson":   "#DC143C",
 	"coral":     "#F08080",
@@ -44,28 +41,34 @@ var MENU_COLORS = map[string]string{
 	"none":      "",
 }
 
-// Adds bookmarks based on provided LABEL or LABEL:PATH; restricted to $HOME
+// HandleAdd handles the addition of bookmarks, based on provided provided label or label/path pair; restricted to $HOME
+//
+// config - Pointer to a struct representing the current state of user's fcd_config.json
+// commandArg - String representing user's input for a new Shortcut
 func HandleAdd(config *Config, commandArg string) error {
-	var label, path string
-	// If arg value has "LABEL:PATH"
+	var shortcutLabel, shortcutPath string
+	// If commandArg is equal to "label:shortcutPath", parse "shortcutLabel" and "shortcutPath"
 	if strings.Contains(commandArg, ":") {
 		parts := strings.SplitN(commandArg, ":", 2)
-		label = parts[0]
-		path = parts[1]
-		// If only "PATH" is provided
+		shortcutLabel = parts[0]
+		shortcutPath = parts[1]
+	// If commandArg is equal to "shortcutPath", parse "shortcutLabel"
 	} else {
-		path = commandArg
-		label = filepath.Base(path)
+		shortcutPath = commandArg
+		shortcutLabel = filepath.Base(shortcutPath)
 	}
 
-	label = strings.ToUpper(strings.TrimSpace(label))
-	if err := config.AddShortcut(label, path); err != nil {
+	// Format "SHORTCUTLABEL" as "SHORTCUTLABEL", then add "SHORTCUTLABEL" and "shortcutPath"
+	shortcutLabel = strings.ToUpper(strings.TrimSpace(shortcutLabel))
+	if err := config.AddShortcut(shortcutLabel, shortcutPath); err != nil {
 		return err
 	}
 	return SaveToConfig(config)
 }
 
-// Removes file based on provided LABEL
+// HandleRemove removes a Shortcut from Config based on the Shortcut.Label
+//
+// commandArg - String representing user's input of a matching label to a Shortcut
 func HandleRemove(config *Config, commandArg string) error {
 	// Convert commandArg to match shortcut label
 	removeLabel := strings.ToUpper(strings.TrimSpace(commandArg))
@@ -73,23 +76,29 @@ func HandleRemove(config *Config, commandArg string) error {
 	newShortcuts := make([]Shortcut, 0, len(config.Shortcuts))
 	found := false
 	for _, sc := range config.Shortcuts {
-		// Exclude shortcut from being added back to newShorcuts array
+		// Exclude shortcut from being added back to new Shortcuts array
 		if sc.Label == removeLabel {
 			found = true
 			continue
 		}
-		// Add shortcut to newShortcuts array
+		// Add each Shortcut to newShortcuts array
 		newShortcuts = append(newShortcuts, sc)
 	}
+	// Check if label is invalid or Shortcut does not exist
 	if !found {
 		return fmt.Errorf("fcd: no shortcut found with label %q\n", removeLabel)
 	}
+	// Update new Shortcuts array and save data to fcd_config.json
 	config.Shortcuts = newShortcuts
 	return SaveToConfig(config)
 }
 
-// 'Branches' to the path that matches the provided LABEL
+// HandleBranch handles the 'branching' to a Shortcut based on the label provided
+//
+// config - Pointer to a struct representing the current state of user's fcd_config.json
+// commandArg - String representing user's input of a corresponding label to branch to
 func HandleBranch(config *Config, commandArg string) string {
+	// Iterate and check LABEL exists in config.Shortcuts
 	for _, sc := range config.Shortcuts {
 		if sc.Label == strings.ToUpper(strings.TrimSpace(commandArg)) {
 			return sc.Path
@@ -99,33 +108,40 @@ func HandleBranch(config *Config, commandArg string) string {
 	return ""
 }
 
-// Clear all bookmarks from fcd_config.json
+// handleClear handles clearing all saved Shortcuts from fcd_config.json
 func HandleClear(config *Config) error {
-	// Get confirmation from user (y/n)
+	// Get confirmation from user on clearing Shortcuts (y/n)
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Fprintf(os.Stderr, "fcd: Are you sure you want to clear all bookmarks? (y/n): ")
 
 	input, _ := reader.ReadString('\n')
 	input = strings.TrimSpace(input)
 	switch strings.ToLower(input) {
-	// Assign the shortcuts to empty array and save
+	// Update the config.Shortcuts to empty array and save to fcd_config.json
 	case "y":
 		config.Shortcuts = []Shortcut{}
 		return SaveToConfig(config)
+	// Cancel operations if "n" or some other invalid answer
 	case "n":
 		fallthrough
 	default:
-		// return fmt.Errorf("fcd: Defaulting to no - operation ceased")
 		return fmt.Errorf("fcd: Canceled clearing bookmarks")
 	}
 }
 
+// HandlePrint handles printing all shortcuts present within user's fcd_config.json
+//
+// config - Pointer to a struct representing the current state of user's fcd_config.json
 func HandlePrint(config *Config) {
 	for _, sc := range config.Shortcuts {
 		fmt.Fprintf(os.Stderr, "%-10s %s\n", sc.Label, sc.Path)
 	}
 }
 
+// HandleSetColors handles setting primary, secondary, and tertiary colors for 
+// bubbles/list component
+//
+// config - Pointer to a struct representing the current state of user's fcd_config.json
 func HandleSetColor(config *Config) error {
 	// Create setcolor command
 	setColorCmd := flag.NewFlagSet("setcolor", flag.ExitOnError)
@@ -185,6 +201,7 @@ func HandleSetColor(config *Config) error {
 	return SaveToConfig(config)
 }
 
+// HandleListColors handles the printing of all available colors, as listed within MENU_COLORS
 func HandleListColors() {
 	fmt.Fprintln(os.Stderr, "fcd: Printing all supported colors")
 	for name, hex := range MENU_COLORS {
@@ -196,20 +213,26 @@ func HandleListColors() {
 	}
 }
 
+// HandleHelp handles printing the usage of fcd and all functionality present within the CLI
 func HandleHelp() {
 	fmt.Fprintln(os.Stderr, "fcd - fast change directory")
 	fmt.Fprintln(os.Stderr, "  - Change into bookmarked directories using custom labels")
 	fmt.Fprintln(os.Stderr, "  - Limited to directories within a user's home directory")
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "Usage:")
-	fmt.Fprintln(os.Stderr, "  fcd                   Search saved shortcuts")
-	fmt.Fprintln(os.Stderr, "  fcd add <PATH>        Add a shortcut")
-	fmt.Fprintln(os.Stderr, "  fcd remove <LABEL>    Remove a shortcut")
-	fmt.Fprintln(os.Stderr, "  fcd branch <LABEL>    Branch to a shortcut")
-	fmt.Fprintln(os.Stderr, "  fcd clear             Clear all shortcuts")
-	fmt.Fprintln(os.Stderr, "  fcd print             Print all shortcuts")
+	fmt.Fprintln(os.Stderr, "  fcd                               Opens interactive menu for viewing saved shortcuts within user's configuration")
+	fmt.Fprintln(os.Stderr, "  fcd add <PATH>                    Add a shortcut saved within user's configuration")
+	fmt.Fprintln(os.Stderr, "  fcd remove <LABEL>                Remove a shortcut saved within user's configuration")
+	fmt.Fprintln(os.Stderr, "  fcd branch <LABEL>                Changes directory to a shortcut saved within user's configuration")
+	fmt.Fprintln(os.Stderr, "  fcd clear                         Clear all shortcuts saved within user's configuration")
+	fmt.Fprintln(os.Stderr, "  fcd print                         Print all shortcuts saved within user's configuration")
+	fmt.Fprintln(os.Stderr, "  fcd listcolors                    Prints all colors available with corresponding hex values")
+	fmt.Fprintln(os.Stderr, "  fcd setcolor [-p] [-s] [t]        Prints all colors available with corresponding hex values")
 }
 
+// HandleMenu handles the initialization and customization of bubbles/list component
+//
+// config - Pointer to a struct representing the current state of user's fcd_config.json
 func HandleMenu(config *Config) string {
 	// Ensures ANSI colors will be rendered for both stdout and stderr
 	lipgloss.SetColorProfile(termenv.TrueColor)

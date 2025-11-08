@@ -5,6 +5,9 @@ import (
 	"os"
 )
 
+// HandleSubcommands handles the entirety of fcd functionality in the command line
+//
+// config - Pointer to Config struct that stores the user's current fcd_config.json data
 func HandleSubcommands(config *Config) {
 	/* os.Args = {"fcd", command, commandArg} */
 	var command string = ""
@@ -22,6 +25,7 @@ func HandleSubcommands(config *Config) {
 	}
 
 	switch command {
+	// fcd add
 	case "add":
 		{
 			if err := HandleAdd(config, commandArg); err != nil {
@@ -30,7 +34,7 @@ func HandleSubcommands(config *Config) {
 			}
 			fmt.Fprintf(os.Stderr, "fcd: Saved shortcut %q\n", commandArg)
 		}
-
+	// fcd remove
 	case "remove":
 		{
 			if err := HandleRemove(config, commandArg); err != nil {
@@ -39,6 +43,7 @@ func HandleSubcommands(config *Config) {
 			}
 			fmt.Fprintf(os.Stderr, "fcd: Successfully removed %q\n", commandArg)
 		}
+	// fcd branch
 	case "branch":
 		{
 			// fmt.Fprintln(os.Stderr, "fcd: Successful branch: '", commandArg, "'")
@@ -47,6 +52,7 @@ func HandleSubcommands(config *Config) {
 				fmt.Println(selectedBookmark)
 			}
 		}
+	// fcd clear
 	case "clear":
 		{
 			if err := HandleClear(config); err != nil {
@@ -56,6 +62,7 @@ func HandleSubcommands(config *Config) {
 				fmt.Fprintln(os.Stderr, "fcd: Successfully cleared all shortcuts")
 			}
 		}
+	// fcd print
 	case "print":
 		{
 			// If no added shortcuts, exit
@@ -66,27 +73,31 @@ func HandleSubcommands(config *Config) {
 			fmt.Fprintln(os.Stderr, "fcd: Printing all shortcut directories...")
 			HandlePrint(config)
 		}
+	// fcd setcolor
 	case "setcolor":
 		{
 			HandleSetColor(config)
 		}
+	// fcd listcolors
 	case "listcolors":
 		{
 			HandleListColors()
 		}
+	// fcd help
 	case "help":
 		{
 			HandleHelp()
 		}
+	// fcd
 	case "":
 		{
-			// If no added shortcuts, exit
+			// If no shortcuts are present within fcd_config.json, exit
 			if len(config.Shortcuts) == 0 {
 				fmt.Fprintln(os.Stderr, "fcd: No existing shortcuts")
 				os.Exit(1)
 			}
 
-			// RETURNING OUTPUT FROM FCD MENU
+			// Returns the path of a Shortcut selected within the bubbles/list component
 			if len(os.Args) == 1 {
 				selectedPath := HandleMenu(config)
 				if selectedPath != "" {

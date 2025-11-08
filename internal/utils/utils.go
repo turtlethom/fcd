@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-// Checks if a given path resides within the user's $HOME directory
+// IsInsideHome checks if a given path resides within the user's home directory
 func IsInsideHome(path string) (string, error) {
 	// Expand ~ if present
 	if strings.HasPrefix(path, "~") {
@@ -18,7 +18,7 @@ func IsInsideHome(path string) (string, error) {
 		path = filepath.Join(home, path[1:])
 	}
 
-	// Convert to absolute
+	// Convert to absolute path
 	absPath, err := filepath.Abs(path)
 	if err != nil {
 		return "", err
@@ -44,7 +44,7 @@ func IsInsideHome(path string) (string, error) {
 	return absPath, nil
 }
 
-// Helper function for color selection by the user
+// SelectColor is a helper function for color selection by the user
 func SelectColor(color string) (string, error) {
 	switch strings.ToLower(color) {
 	case "crimson":

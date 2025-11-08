@@ -40,7 +40,9 @@ type UserColors struct {
 }
 
 // Config defines the user's configuration settings for fcd,
-// as defined with fcd_config.json
+// as defined within fcd_config.json
+//
+// It manages the state of the current state within the configuration
 type Config struct {
 	Shortcuts 	[]Shortcut 	`json:"shortcuts"`
 	UserColors 	UserColors 	`json:"userColors"`
@@ -59,8 +61,8 @@ func fetchUserConfig() (string, error) {
 // CreateConfig initializes the configuration for fcd_config.json,
 // and returns a pointer to a new Config
 // 
-// When invoked,
-func CreateConfig(path string) (*Config, error) {
+// fcdConfigPath - String representing the absolute path to fcd_config.json
+func CreateDefaultConfig() (*Config, error) {
 	config := &Config{
 		Shortcuts: []Shortcut{},
 		UserColors: UserColors{
@@ -69,48 +71,59 @@ func CreateConfig(path string) (*Config, error) {
 				Tertiary: "",
 		},
 	}
+	// Saving default state of new Config to fcd_config.json
 	if err := SaveToConfig(config); err != nil {
 		return nil, err
 	}
 	return config, nil
 }
 
-// Reads the JSON config from disk
-func LoadConfig(path string) (*Config, error) {
-	f, err := os.Open(path)
+// LoadConfig reads data from fcd_config.json, decoding user configuration
+// settings into a new Config
+//
+// fcdConfigPath - String representing the absolute path to fcd_config.json
+func LoadConfig(fcdConfigPath string) (*Config, error) {
+	configFile, err := os.Open(fcdConfigPath)
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
+	defer configFile.Close()
 
 	var config Config
-	decoder := json.NewDecoder(f)
-	// If empty file or bad JSON → reset to empty config
+	decoder := json.NewDecoder(configFile)
+	// If file is empty or malformed JSON data in config file → reset to empty config
 	if err := decoder.Decode(&config); err != nil {
-		return &Config{Shortcuts: []Shortcut{}}, nil
+		// return &Config{Shortcuts: []Shortcut{}}, nil
+		return CreateDefaultConfig();
 	}
 	return &config, nil
 }
 
-// Loads config or creates it if missing
+// HandleConfig controls whether a user's fcd_config.json must be initialized or loaded
+//
+// fcd_config.json is initialized with default configuration settings if not present
+// Else, fcd_config.json is loaded into Config instance
 func HandleConfig() (*Config, error) {
-	path, err := fetchUserConfig()
+	fcdConfigPath, err := fetchUserConfig()
 	if err != nil {
 		return nil, err
 	}
-	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
-		return CreateConfig(path)
+	if _, err := os.Stat(fcdConfigPath); errors.Is(err, os.ErrNotExist) {
+		return CreateDefaultConfig()
 	}
-	return LoadConfig(path)
+	return LoadConfig(fcdConfigPath)
 }
-// Adds a new shortcut if its label AND path are unique.
-func (c *Config) AddShortcut(label, path string) error {
-	absPath, err := utils.IsInsideHome(path)
+// AddShortcut appends a new shortcut to the Config.Shortcuts array of a Config instance
+//
+// label - String representing title for new Shortcut
+// dirPath - String representing directory path for new Shortcut
+func (c *Config) AddShortcut(label, dirPath string) error {
+	// Ensures the path to the shortcut is within the user's home directory
+	absPath, err := utils.IsInsideHome(dirPath)
 	if err != nil {
 		return err
 	}
-
-	// Check for duplicates
+	// Checks whether a duplicate Shortcut exists within Config.Shortcuts
 	for _, sc := range c.Shortcuts {
 		if sc.Label == label {
 			return fmt.Errorf("shortcut with label %q already exists", label)
@@ -119,7 +132,7 @@ func (c *Config) AddShortcut(label, path string) error {
 			return fmt.Errorf("shortcut for path %q already exists", absPath)
 		}
 	}
-
+	// Appends new Shortcut to Config.Shortcuts
 	c.Shortcuts = append(c.Shortcuts, Shortcut{
 		Label: label,
 		Path:  absPath,
@@ -127,31 +140,32 @@ func (c *Config) AddShortcut(label, path string) error {
 	return nil
 }
 
-// SaveToConfig stores the new state of the config back to json file
+// SaveToConfig stores the current state of the Config back to fcd_config.json file
 func SaveToConfig(config *Config) error {
-	path, err := fetchUserConfig()
+	fcdConfigPath, err := fetchUserConfig()
 	if err != nil {
 		return err
 	}
-	// Formatting JSON data
-	data, err := json.MarshalIndent(config, "", "  ")
+	// Formatting JSON data from fcd_config.json
+	fcdConfigData, err := json.MarshalIndent(config, "", "  ")
 	if err != nil {
 		return err
 	}
-	// Check if parent directory exists
-	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+	// Ensure parent directory exists
+	if err := os.MkdirAll(filepath.Dir(fcdConfigPath), 0o755); err != nil {
 		return err
 	}
-	return os.WriteFile(path, data, 0o644)
+	// Write Config state to fcd_config.json
+	return os.WriteFile(fcdConfigPath, fcdConfigData, 0o644)
 }
 
-// Parse shortcuts from user config into list.Model
+// ToListModel parses Config.Shortcuts from user configuration into list.Model
 func (c *Config) ToListModel() list.Model {
 	items := make([]list.Item, 0, len(c.Shortcuts))
 	for i, sc := range c.Shortcuts {
 		items[i] = sc
 	}
-	m := list.New(items, list.NewDefaultDelegate(), 0, 0)
-	m.Title = "Shortcuts"
-	return m
+	listModel := list.New(items, list.NewDefaultDelegate(), 0, 0)
+	listModel.Title = "Shortcuts"
+	return listModel
 }

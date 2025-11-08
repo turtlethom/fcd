@@ -14,12 +14,12 @@ type Model struct {
 	Selected int        // Selected option
 }
 
-// Initializes Bubble Tea, can return initial commands
+// Init Initializes Bubble Tea Model, can return initial commands
 func (m Model) Init() tea.Cmd {
 	return nil
 }
 
-// Receives current model and a message, returns new model and a command
+// Update receives current model and a message, returns new model and a command
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
@@ -42,8 +42,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-// Returns string that should be rendered to the terminal
-// Controls how UI looks based on model's state
+// View controls how UI looks based on model's state
+//
+// Returns a string that should be rendered to the terminal
 func (m Model) View() string {
 	return docStyle.Render(m.List.View())
 }
