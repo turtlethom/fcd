@@ -1,4 +1,4 @@
-package cmd
+package internal
 
 import (
 	"encoding/json"
@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 
 	"github.com/charmbracelet/bubbles/list"
-	"github.com/turtlethom/fcd/internal/utils"
 )
 
 // Shortcut stores the corresponding Label and Path to a bookmarked directory,
@@ -119,7 +118,7 @@ func HandleConfig() (*Config, error) {
 // dirPath - String representing directory path for new Shortcut
 func (c *Config) AddShortcut(label, dirPath string) error {
 	// Ensures the path to the shortcut is within the user's home directory
-	absPath, err := utils.IsInsideHome(dirPath)
+	absPath, err := IsInsideHome(dirPath)
 	if err != nil {
 		return err
 	}

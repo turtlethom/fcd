@@ -1,15 +1,20 @@
+/*
+Copyright © 2025 NAME HERE <EMAIL ADDRESS>
+*/
 package main
 
 import (
 	"log"
 
-	"github.com/turtlethom/fcd/internal/cmd"
+	"github.com/turtlethom/fcd/cmd"
+	"github.com/turtlethom/fcd/internal"
 )
 
 func main() {
-	config, err := cmd.HandleConfig()
+	config, err := internal.HandleConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
-	cmd.HandleSubcommands(config)
+	cmd.SetConfig(config)
+	cmd.Execute()
 }
