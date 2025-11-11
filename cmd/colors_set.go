@@ -15,11 +15,14 @@ var (
 	tertiaryColor  string
 
 	colorsSetCmd = &cobra.Command{
-		Use:   "set",
+		Use:     "set",
 		Example: "fcd colors set --primary crimson --secondary white --tertiary black",
-		Short: "Sets the colors for the fcd menu",
-		Long:  "Sets the colors for the fcd menu",
+		Short:   "Sets the colors for the fcd menu",
+		Long:    "Sets the colors for the fcd menu",
 		Run: func(cmd *cobra.Command, args []string) {
+			if len(primaryColor)+len(secondaryColor)+len(tertiaryColor) == 0 {
+				cmd.Help()
+			}
 			handleSetColor(config)
 		},
 	}
@@ -28,43 +31,38 @@ var (
 func handleSetColor(config *internal.Config) {
 	// If --primary color
 	if primaryColor != "" {
-		hex, err := validateColorChoice(primaryColor)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, "primary color not set: ", err)
-		} else {
-			fmt.Fprintf(os.Stderr, "fcd: setting primary color to [%v - %v]\n", primaryColor, hex)
-			// config.UserColors.Primary = hex
+		hex, valid := validateColorChoice("primary", primaryColor)
+		if valid {
+			config.UserColors.Primary = hex
 		}
 	}
 	// If --secondary color
 	if secondaryColor != "" {
-		hex, err := validateColorChoice(secondaryColor)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, "secondary color not set: ", err)
-		} else {
-			fmt.Fprintf(os.Stderr, "fcd: setting secondary color to [%v - %v]\n", secondaryColor, hex)
-			// config.UserColors.Secondary = hex
+		hex, valid := validateColorChoice("secondary", secondaryColor)
+		if valid {
+			config.UserColors.Secondary = hex
 		}
 	}
 	// If --tertiary color
 	if tertiaryColor != "" {
-		hex, err := validateColorChoice(tertiaryColor)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, "tertiary color not set: ", err)
-		} else {
-			fmt.Fprintf(os.Stderr, "fcd: setting tertiary color to [%v - %v]\n", tertiaryColor, hex)
-			// config.UserColors.Tertiary = hex
+		hex, valid := validateColorChoice("tertiary", tertiaryColor)
+		if valid {
+			config.UserColors.Tertiary = hex
 		}
 	}
 
 	internal.SaveToConfig(config)
 }
 
-func validateColorChoice(color string) (string, error) {
-		if hex, ok := MENU_COLORS[color]; ok {
-			return hex, nil
-		}
-	return "", fmt.Errorf("[%v - N/A]", color)
+func validateColorChoice(colorFor string, colorName string) (string, bool) {
+	if hex, ok := MENU_COLORS[colorName]; ok {
+		// If color is valid and notify color exists and will be set
+		fmt.Fprintf(os.Stderr, "fcd: setting %v color to [%v - %v]\n", colorFor, colorName, hex)
+		return hex, true
+	}
+	// Else color is invalid, notify that color does not exist and will not be set
+	fmt.Fprintf(os.Stderr, "Error: %v color not set, '%v' does not exist\n", colorFor, colorName)
+	return "", false
 }
 
 func init() {

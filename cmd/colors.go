@@ -26,7 +26,7 @@ var MENU_COLORS = map[string]string{
 	"white":     "#FFFFFF",
 	"black":     "#000000",
 	"brown":     "#A0522D",
-	"none":      "",
+	"none":      "#------",
 }
 
 var colorsCmd = &cobra.Command{
