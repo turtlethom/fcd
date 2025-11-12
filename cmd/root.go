@@ -93,6 +93,7 @@ func init() {
 	rootCmd.AddCommand(branchCmd)
 	rootCmd.AddCommand(clearCmd)
 	rootCmd.AddCommand(colorsCmd)
+	rootCmd.AddCommand(completionCmd)
 	rootCmd.AddCommand(removeCmd)
 	rootCmd.AddCommand(printCmd)
 }

@@ -1,3 +1,6 @@
+/*
+Copyright © 2025 Thomas James <wjamesthomas3@gmail.com>
+*/
 package cmd
 
 import (

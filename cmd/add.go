@@ -1,3 +1,6 @@
+/*
+Copyright © 2025 Thomas James <wjamesthomas3@gmail.com>
+*/
 package cmd
 
 import (
@@ -9,6 +12,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/turtlethom/fcd/internal"
 )
+
+var addValidArgs = []string{}
 
 // addCmd is the cobra command for branching to a Shortcut directory saved within fcd_config.json
 var addCmd = &cobra.Command{
