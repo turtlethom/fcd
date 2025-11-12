@@ -35,9 +35,21 @@ mkdir -p "$SHARE_DIR"
 # Bash/Zsh wrapper
 cat >"$SHARE_DIR/fcd.sh" <<'EOF'
 fcd() {
-  target=$("$HOME/.local/bin/fcd" "$@")
-  if [ -n "$target" ]; then
-    cd "$target" || return
+  local output status
+  output=$("$HOME/.local/bin/fcd" "$@")
+  status=$?
+
+  # if the binary fails, just print its output
+  if [ $status -ne 0 ]; then
+    echo "$output"
+    return $status
+  fi
+
+  # only cd if output is a valid directory
+  if [ -d "$output" ]; then
+    cd "$output" || return
+  elif [ -n "$output" ]; then
+    echo "$output"
   fi
 }
 EOF
@@ -45,9 +57,18 @@ EOF
 # Fish wrapper
 cat >"$SHARE_DIR/fcd.fish" <<'EOF'
 function fcd
-    set target (~/.local/bin/fcd $argv)
-    if test -n "$target"
-        cd $target
+    set output (~/.local/bin/fcd $argv)
+    set status $status
+
+    if test $status -ne 0
+        echo $output
+        return $status
+    end
+
+    if test -d "$output"
+        cd $output
+    else if test -n "$output"
+        echo $output
     end
 end
 EOF
