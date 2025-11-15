@@ -5,14 +5,35 @@ set -e
 echo "[*] Running FCD uninstall test..."
 
 CLEAN=true
+
+# -----------------------------
+# Paths
+# -----------------------------
+BIN="$HOME/.local/bin/fcd"
 SHARE_DIR="$HOME/.local/share/fcd"
-BINARY="$HOME/.local/bin/fcd"
+CONFIG_DIR="$HOME/.config/fcd"
+
+# RC files to check for wrapper and completion lines
+RC_FILES=(
+  "$HOME/.bashrc"
+  "$HOME/.bash_profile"
+  "$HOME/.zshrc"
+  "$HOME/.profile"
+  "$HOME/.config/fish/config.fish"
+)
+
+# Per-user completion scripts
+COMPLETIONS=(
+  "$HOME/.local/share/fcd/fcd.bash"  # Bash
+  "$HOME/.zsh/completions/_fcd"      # Zsh
+  "$HOME/.config/fish/completions/fcd.fish" # Fish
+)
 
 # -----------------------------
 # Check binary
 # -----------------------------
-if [ -f "$BINARY" ]; then
-  echo "[*] Binary still exists: $BINARY"
+if [ -f "$BIN" ]; then
+  echo "[*] Binary still exists: $BIN"
   CLEAN=false
 else
   echo "[ ] Binary removed"
@@ -31,26 +52,38 @@ for wrapper in "$SHARE_DIR/fcd.sh" "$SHARE_DIR/fcd.fish"; do
 done
 
 # -----------------------------
-# Check RC files for source lines
+# Check RC files for wrapper or completion lines
 # -----------------------------
-RC_FILES=(
-  "$HOME/.bashrc"
-  "$HOME/.bash_profile"
-  "$HOME/.zshrc"
-  "$HOME/.profile"
-  "$HOME/.config/fish/config.fish"
-)
-
 for rc in "${RC_FILES[@]}"; do
   if [ -f "$rc" ]; then
     if grep -qF "fcd.sh" "$rc"; then
-      echo "[*] Bash/Zsh source line still present in $rc"
+      echo "[*] Bash/Zsh wrapper line still present in $rc"
       CLEAN=false
     fi
     if grep -qF "fcd.fish" "$rc"; then
-      echo "[*] Fish source line still present in $rc"
+      echo "[*] Fish wrapper line still present in $rc"
       CLEAN=false
     fi
+    if grep -qF "fcd.bash" "$rc"; then
+      echo "[*] Bash completion line still present in $rc"
+      CLEAN=false
+    fi
+    if grep -qF "_fcd" "$rc"; then
+      echo "[*] Zsh completion line still present in $rc"
+      CLEAN=false
+    fi
+  fi
+done
+
+# -----------------------------
+# Check per-user completion scripts
+# -----------------------------
+for comp in "${COMPLETIONS[@]}"; do
+  if [ -f "$comp" ]; then
+    echo "[*] Completion script still exists: $comp"
+    CLEAN=false
+  else
+    echo "[ ] Completion script removed: $comp"
   fi
 done
 
@@ -67,7 +100,6 @@ fi
 # -----------------------------
 # Check config directory
 # -----------------------------
-CONFIG_DIR="$HOME/.config/fcd"
 if [ -d "$CONFIG_DIR" ]; then
   echo "[*] Config directory still exists: $CONFIG_DIR"
   CLEAN=false

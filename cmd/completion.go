@@ -18,14 +18,20 @@ var completionCmd = &cobra.Command{
 	ValidArgs: []string{"bash", "zsh", "fish"},
 	Args: cobra.ExactArgs(1),
 	Example: `
-  # Bash
-  fcd completion bash > /etc/bash_completion.d/fcd
-
-  # Zsh
-  fcd completion zsh > "${fpath[1]}/_fcd"
-
-  # Fish
-  fcd completion fish > ~/.config/fish/completions/fcd.fish
+===============================================================
+# BASH (per user)
+    fcd completion bash > ~/.local/share/fcd/fcd.bash
+    echo "source ~/.local/share/fcd/fcd.bash" >> ~/.bashrc
+===============================================================
+# ZSH (per user)
+    mkdir -p ~/.zsh/completions
+    fcd completion zsh > ~/.zsh/completions/_fcd
+    echo 'fpath+=("$HOME/.zsh/completions")' >> ~/.zshrc
+    echo 'autoload -Uz compinit && compinit' >> ~/.zshrc
+===============================================================
+# FISH (per user)
+    fcd completion fish > ~/.config/fish/completions/fcd.fish
+===============================================================
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		switch args[0] {

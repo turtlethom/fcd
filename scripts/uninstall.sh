@@ -39,12 +39,37 @@ RC_FILES=(
 
 for rc in "${RC_FILES[@]}"; do
   if [ -f "$rc" ]; then
-    # Remove lines containing 'fcd.sh' or 'fcd.fish'
-    sed -i.bak '/fcd\.sh/d' "$rc" || true
-    sed -i.bak '/fcd\.fish/d' "$rc" || true
-    echo "[*] Removed FCD source lines from $rc (backup saved as $rc.bak)"
+    # Delete the comment line and the line immediately following it (the source)
+    sed -i.bak '/# fcd wrapper function for '\''fcd'\'' command (generated)/,+1d' "$rc" || true
+    echo "[*] Removed FCD wrapper comment and source lines from $rc (backup saved as $rc.bak)"
   fi
 done
+
+# -----------------------------
+# Remove user-level completion scripts
+# -----------------------------
+echo "[*] Removing completion scripts..."
+
+# Bash
+BASH_COMPLETION="$HOME/.local/share/fcd/fcd.bash"
+if [ -f "$BASH_COMPLETION" ]; then
+  rm -f "$BASH_COMPLETION"
+  echo "[*] Removed Bash completion: $BASH_COMPLETION"
+fi
+
+# Zsh
+ZSH_COMPLETION="$HOME/.zsh/completions/_fcd"
+if [ -f "$ZSH_COMPLETION" ]; then
+  rm -f "$ZSH_COMPLETION"
+  echo "[*] Removed Zsh completion: $ZSH_COMPLETION"
+fi
+
+# Fish
+FISH_COMPLETION="$HOME/.config/fish/completions/fcd.fish"
+if [ -f "$FISH_COMPLETION" ]; then
+  rm -f "$FISH_COMPLETION"
+  echo "[*] Removed Fish completion: $FISH_COMPLETION"
+fi
 
 # -----------------------------
 # Cleanup share directory if empty

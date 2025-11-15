@@ -34,6 +34,7 @@ mkdir -p "$SHARE_DIR"
 
 # Bash/Zsh wrapper
 cat >"$SHARE_DIR/fcd.sh" <<'EOF'
+# Captures output for changing directory or displaying messages accordingly
 fcd() {
   local output status
   output=$("$HOME/.local/bin/fcd" "$@")
@@ -56,6 +57,7 @@ EOF
 
 # Fish wrapper
 cat >"$SHARE_DIR/fcd.fish" <<'EOF'
+# Captures output for changing directory or displaying messages accordingly
 function fcd
     set output (~/.local/bin/fcd $argv)
     set status $status
@@ -105,12 +107,15 @@ echo "[*] Using RC file: $RC_FILE"
 # Add source line to RC file
 # -----------------------------
 if [ "$SHELL_NAME" = "fish" ]; then
+  COMMENT_LINE="# fcd wrapper function for 'fcd' command (generated)"
 	INSTALL_LINE="source $SHARE_DIR/fcd.fish"
 else
+  COMMENT_LINE="# fcd wrapper function for 'fcd' command (generated)"
 	INSTALL_LINE="source $SHARE_DIR/fcd.sh"
 fi
 
 if ! grep -Fxq "$INSTALL_LINE" "$RC_FILE" 2>/dev/null; then
+  echo "$COMMENT_LINE" >>"$RC_FILE"
 	echo "$INSTALL_LINE" >>"$RC_FILE"
 	echo "[*] Added FCD wrapper to $RC_FILE"
 else
@@ -121,11 +126,20 @@ fi
 # Ensure ~/.local/bin is in PATH
 # -----------------------------
 PATH_LINE='export PATH=$HOME/.local/bin:$PATH'
-if [ "$SHELL_NAME" != "fish" ]; then
-	if ! grep -Fxq "$PATH_LINE" "$RC_FILE" 2>/dev/null; then
-		echo "$PATH_LINE" >>"$RC_FILE"
-		echo "[*] Added ~/.local/bin to PATH in $RC_FILE"
-	fi
+FISH_PATH_LINE='set -U fish_user_paths $HOME/.local/bin $fish_user_paths'
+if [ "$SHELL_NAME" = "fish" ]; then
+  # Add ~/.local/bin to fish universal path if not already present
+  if ! echo $fish_user_paths | grep -q "$HOME/.local/bin"; then
+    echo "$FISH_PATH_LINE" | source
+    echo "[*] Added ~/.local/bin to fish_user_paths"
+  fi
+else
+  # Bash/Zsh
+  if ! grep -Fxq "$PATH_LINE" "$RC_FILE" 2>/dev/null; then
+    echo "# Add ~/.local/bin to PATH" >>"$RC_FILE"
+    echo "$PATH_LINE" >>"$RC_FILE"
+    echo "[*] Added ~/.local/bin to PATH in $RC_FILE"
+  fi
 fi
 
 # -----------------------------
@@ -134,3 +148,19 @@ fi
 echo "[*] Installation complete!"
 echo "Restart your shell or run: source $RC_FILE"
 echo "Then you can use: fcd"
+echo
+echo "Optional: generate and source auto-completion manually using:"
+echo "============================================================================"
+echo "# BASH (per user)"
+echo "  fcd completion bash  > ~/.local/share/fcd/fcd.bash"
+echo '  echo "source ~/.local/share/fcd/fcd.bash" >> ~/.bashrc'
+echo "============================================================================"
+echo "# ZSH (per user)"
+echo "  mkdir -p ~/.zsh/completions"
+echo "  fcd completion zsh   > ~/.zsh/completions/_fcd"
+echo "  echo 'fpath+=(\"$HOME/.zsh/completions\")' >> ~/.zshrc"
+echo "  echo 'autoload -Uz compinit && compinit' >> ~/.zshrc"
+echo "============================================================================"
+echo "# FISH (per user)"
+echo "  fcd completion fish  > ~/.config/fish/completions/fcd.fish"
+echo "============================================================================"
