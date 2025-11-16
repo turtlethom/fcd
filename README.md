@@ -1,55 +1,69 @@
-## 🚀 fcd — Fast Change Directory  
-A **shortcut dropdown menu** (powered by [`bubbletea`](https://github.com/charmbracelet/bubbletea)) for jumping into your bookmarked directories **blazingly fast**.  
-### 📝 Note
-fcd currently supports **only directories located inside your `$HOME`**. Bookmarks outside `$HOME` are not allowed.
----
+# 🚀 fcd — Fast Change Directory
 
-### 📖 Usage
-
-| Command | Description |
-|---------|-------------|
-| `fcd` | Launch the `bubbletea` menu to explore and jump to bookmarked directories. |
-| `fcd branch <LABEL>` | Jump directly to a bookmarked directory by its label. |
-| `fcd add <PATH>` or `fcd add <LABEL:PATH>` | Add a new bookmark. If only a path is given, the label is automatically set to the folder name. All paths must be prefixed with `~/`|
-| `fcd remove <LABEL>` | Remove a bookmark by its label. |
-| `fcd clear` | Clear **all** bookmarks. |
-| `fcd print` | Print all stored bookmarks in `LABEL:PATH` format. |
-| `fcd setcolor -p <color> -s <color> -t <color>` | Set colors for fcd menu (Primary, Secondary, Tertiary) |
-| `fcd listcolors` | List all colors available for fcd theme |
+**fcd** is a **shortcut dropdown menu** for jumping into your saved directories **blazingly fast**, powered by:  
+- [`bubbletea`](https://github.com/charmbracelet/bubbletea)  
+- [`cobra`](https://github.com/spf13/cobra)  
+- Written in **Golang**, works seamlessly in **bash**, **zsh**, and **fish**.  
 
 ---
 
-### 💡 Examples
+## 📝 Note
+fcd currently supports **only directories located inside your `$HOME`**. Shortcuts outside `$HOME` are **not allowed**.
+
+---
+
+## 📖 Usage
+
+You can use `fcd` in **interactive mode**, or via specific **commands**:
+
+### 🔹 Interactive
+- `fcd` — Opens the interactive menu to explore and jump to saved shortcuts.
+
+### 📌 Bookmark/Shortcut Management
+- `fcd add <shortcut_path>` — Add a directory to saved shortcuts.  
+- `fcd add <shortcut_label:shortcut_path>` — Add a directory with a custom label.  
+- `fcd remove <label>` — Remove a bookmark by label (case insensitive).  
+- `fcd print` — List all saved bookmarks in `LABEL:PATH` format.  
+- `fcd clear` — Remove **all** saved shortcuts.  
+
+### 🏃 Navigation
+- `fcd branch <label>` — Jump to a saved directory by its label.  
+
+### 🎨 Colors & Themes
+- `fcd colors set -p <primary> -s <secondary> -t <tertiary>` — Set theme colors for fcd menu.  
+- `fcd colors list` — List all available colors.  
+
+### ⚙️ System & Help
+- `fcd completion` — Generate shell auto-completion scripts.  
+- `fcd help` — Show help for any command.  
+
+---
+
+## 💡 Examples
 
 ```bash
+# Open interactive menu
 fcd
-# → Opens interactive menu to saved shortcuts 
 
+# Add bookmarks
 fcd add ~/projects/myapp
-# → Adds a bookmark to '~/projects/myapp' labeled "MYAPP"
+fcd add "JOB:~/workspace"
 
-fcd add "JOB:~/work"
-# → Adds a bookmark to '~/work' labeled "JOB"
-
+# Remove bookmark
 fcd remove nvim
-# → Removes a bookmark labeled "NVIM" (case insensitive) from user configuration
 
-fcd branch BASHCONFIG
-# → Changes current working directory to the path matching "BASHCONFIG" (case insensitive)
+# Jump to saved directory
+fcd branch personalconfig
 
+# Clear all shortcuts
 fcd clear
-# → Clears all shortcuts from user configuration
 
+# Print all bookmarks
 fcd print
-# → Lists all saved bookmarks within user configuration
 
-fcd setcolor -p pink -s white -t black
-# → Set theme color for primary, secondary, and tertiary colors
-
-fcd listcolors
-# → Lists all colors available to fcd menu
-```
----
+# Manage colors
+fcd colors set -p pink -s white -t black
+fcd colors list
 ### 🛠 Compatibility Status
 fcd is fully functional for the following shells:
 - **bash**
