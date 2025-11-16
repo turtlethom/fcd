@@ -1,101 +1,66 @@
 #!/usr/bin/env bash
 set -e
 
-echo "[*] Starting FCD uninstallation..."
+echo "[*] Uninstalling FCD..."
 
+BIN="$HOME/.local/bin/fcd"
 SHARE_DIR="$HOME/.local/share/fcd"
-BINARY="$HOME/.local/bin/fcd"
+CONFIG_DIR="$HOME/.config/fcd"
 
 # -----------------------------
 # Remove binary
 # -----------------------------
-if [ -f "$BINARY" ]; then
-  rm -f "$BINARY"
-  echo "[*] Removed binary: $BINARY"
-else
-  echo "[*] Binary not found, skipping."
-fi
+rm -f "$BIN" && echo "[✓] Removed binary"
 
 # -----------------------------
-# Remove all shell wrappers
+# Remove wrappers
 # -----------------------------
-for wrapper in "$SHARE_DIR/fcd.sh" "$SHARE_DIR/fcd.fish"; do
-  if [ -f "$wrapper" ]; then
-    rm -f "$wrapper"
-    echo "[*] Removed wrapper: $wrapper"
-  fi
-done
+rm -f "$SHARE_DIR/fcd.sh" "$SHARE_DIR/fcd.fish" && echo "[✓] Removed wrapper files"
 
 # -----------------------------
-# Remove source lines from all RC files
+# Clean RC files
 # -----------------------------
 RC_FILES=(
-  "$HOME/.bashrc"
-  "$HOME/.bash_profile"
-  "$HOME/.zshrc"
-  "$HOME/.profile"
-  "$HOME/.config/fish/config.fish"
+    "$HOME/.bashrc"
+    "$HOME/.bash_profile"
+    "$HOME/.zshrc"
+    "$HOME/.profile"
+    "$HOME/.config/fish/config.fish"
 )
 
+COMMENT="# fcd wrapper (generated)"
+WRAPPER_BASH="$HOME/.local/share/fcd/fcd.sh"
+WRAPPER_FISH="$HOME/.local/share/fcd/fcd.fish"
+
 for rc in "${RC_FILES[@]}"; do
-  if [ -f "$rc" ]; then
-
-    # Remove wrapper block (if present)
-    sed -i.bak "/# fcd wrapper function for 'fcd' command (generated)/,+1d" "$rc" || true
-
-    # Remove any completion sourcing lines
-    sed -i.bak '/source .*fcd\.bash/d' "$rc" || true
-    sed -i.bak '/source .*fcd\.sh/d' "$rc" || true
-    sed -i.bak '/fcd\.fish/d' "$rc" || true
-
-    echo "[*] Cleaned FCD lines from $rc (backup in $rc.bak)"
-  fi
+    if [ -f "$rc" ]; then
+        # Use | delimiter to avoid slashes issues
+        sed -i.bak "\|$COMMENT|d" "$rc" || true
+        sed -i.bak "\|$WRAPPER_BASH|d" "$rc" || true
+        sed -i.bak "\|$WRAPPER_FISH|d" "$rc" || true
+        echo "[*] Cleaned FCD entries from $rc"
+    fi
 done
 
 # -----------------------------
-# Remove user-level completion scripts
+# Remove per-user completion scripts
 # -----------------------------
-echo "[*] Removing completion scripts..."
-
-# Bash
-BASH_COMPLETION="$HOME/.local/share/fcd/fcd.bash"
-if [ -f "$BASH_COMPLETION" ]; then
-  rm -f "$BASH_COMPLETION"
-  echo "[*] Removed Bash completion: $BASH_COMPLETION"
-fi
-
-# Zsh
-ZSH_COMPLETION="$HOME/.zsh/completions/_fcd"
-if [ -f "$ZSH_COMPLETION" ]; then
-  rm -f "$ZSH_COMPLETION"
-  echo "[*] Removed Zsh completion: $ZSH_COMPLETION"
-fi
-
-# Fish
-FISH_COMPLETION="$HOME/.config/fish/completions/fcd.fish"
-if [ -f "$FISH_COMPLETION" ]; then
-  rm -f "$FISH_COMPLETION"
-  echo "[*] Removed Fish completion: $FISH_COMPLETION"
-fi
+rm -f "$HOME/.local/share/fcd/fcd.bash" \
+      "$HOME/.zsh/completions/_fcd" \
+      "$HOME/.config/fish/completions/fcd.fish" \
+      2>/dev/null && echo "[✓] Removed completion scripts"
 
 # -----------------------------
-# Cleanup share directory if empty
+# Remove config directory
+# -----------------------------
+rm -rf "$CONFIG_DIR" && echo "[✓] Removed config directory"
+
+# -----------------------------
+# Remove empty share directory
 # -----------------------------
 if [ -d "$SHARE_DIR" ] && [ -z "$(ls -A "$SHARE_DIR")" ]; then
-  rmdir "$SHARE_DIR"
-  echo "[*] Removed empty share directory: $SHARE_DIR"
+    rmdir "$SHARE_DIR"
+    echo "[✓] Removed empty share directory"
 fi
 
-# -----------------------------
-# Remove config directory (~/.config/fcd)
-# -----------------------------
-CONFIG_DIR="$HOME/.config/fcd"
-if [ -d "$CONFIG_DIR" ]; then
-  rm -rf "$CONFIG_DIR"
-  echo "[*] Removed config directory: $CONFIG_DIR"
-else
-  echo "[ ] Config directory not found, skipping: $CONFIG_DIR"
-fi
-
-echo "[*] FCD uninstallation complete!"
-echo "Restart your shell to apply changes."
+echo "[✓] Uninstalled successfully!"
