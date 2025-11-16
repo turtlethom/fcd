@@ -39,9 +39,16 @@ RC_FILES=(
 
 for rc in "${RC_FILES[@]}"; do
   if [ -f "$rc" ]; then
-    # Delete the comment line and the line immediately following it (the source)
-    sed -i.bak '/# fcd wrapper function for '\''fcd'\'' command (generated)/,+1d' "$rc" || true
-    echo "[*] Removed FCD wrapper comment and source lines from $rc (backup saved as $rc.bak)"
+
+    # Remove wrapper block (if present)
+    sed -i.bak "/# fcd wrapper function for 'fcd' command (generated)/,+1d" "$rc" || true
+
+    # Remove any completion sourcing lines
+    sed -i.bak '/source .*fcd\.bash/d' "$rc" || true
+    sed -i.bak '/source .*fcd\.sh/d' "$rc" || true
+    sed -i.bak '/fcd\.fish/d' "$rc" || true
+
+    echo "[*] Cleaned FCD lines from $rc (backup in $rc.bak)"
   fi
 done
 
