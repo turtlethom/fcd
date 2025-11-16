@@ -15,24 +15,9 @@ import (
 var completionCmd = &cobra.Command{
 	Use:       "completion [bash|zsh|fish|powershell]",
 	Short:     "Generates fcd auto-completion scripts",
+	Long:      "Generates fcd auto-completion scripts (if you want to see autocompletions generated for fcd)",
 	ValidArgs: []string{"bash", "zsh", "fish"},
-	Args: cobra.ExactArgs(1),
-	Example: `
-===============================================================
-# BASH (per user)
-    fcd completion bash > ~/.local/share/fcd/fcd.bash
-    echo "source ~/.local/share/fcd/fcd.bash" >> ~/.bashrc
-===============================================================
-# ZSH (per user)
-    mkdir -p ~/.zsh/completions
-    fcd completion zsh > ~/.zsh/completions/_fcd
-    echo 'fpath+=("$HOME/.zsh/completions")' >> ~/.zshrc
-    echo 'autoload -Uz compinit && compinit' >> ~/.zshrc
-===============================================================
-# FISH (per user)
-    fcd completion fish > ~/.config/fish/completions/fcd.fish
-===============================================================
-`,
+	Args:      cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		switch args[0] {
 		case "bash":
