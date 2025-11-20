@@ -7,26 +7,25 @@
 
 ---
 
-## Note
+# Note
 fcd currently supports **only directories located inside your `$HOME`**. Shortcuts outside `$HOME` are **not allowed**.
 
 ---
 
-## Usage
-
+# Usage
 You can use `fcd` in **interactive mode**, or via specific **commands**:
 
-### 🔹 Interactive
+### Interactive Menu
 - `fcd` — Opens the interactive menu to explore and jump to saved shortcuts.
 
-### 📌 Bookmark/Shortcut Management
+### Shortcut Management
 - `fcd add <shortcut_path>` — Add a directory to saved shortcuts.  
 - `fcd add <shortcut_label:shortcut_path>` — Add a directory with a custom label.  
 - `fcd remove <label>` — Remove a bookmark by label (case insensitive).  
 - `fcd print` — List all saved bookmarks in `LABEL:PATH` format.  
 - `fcd clear` — Remove **all** saved shortcuts.  
 
-### 🏃 Navigation
+### Navigation
 - `fcd branch <label>` — Jump to a saved directory by its label.  
 
 ### Colors & Themes
