@@ -1,4 +1,4 @@
-# 🚀 fcd — Fast Change Directory
+# fcd — Fast Change Directory
 
 **fcd** is a **shortcut dropdown menu** for jumping into your saved directories **blazingly fast**, powered by:  
 - [`bubbletea`](https://github.com/charmbracelet/bubbletea)  
@@ -7,12 +7,12 @@
 
 ---
 
-## 📝 Note
+## Note
 fcd currently supports **only directories located inside your `$HOME`**. Shortcuts outside `$HOME` are **not allowed**.
 
 ---
 
-## 📖 Usage
+## Usage
 
 You can use `fcd` in **interactive mode**, or via specific **commands**:
 
@@ -29,17 +29,17 @@ You can use `fcd` in **interactive mode**, or via specific **commands**:
 ### 🏃 Navigation
 - `fcd branch <label>` — Jump to a saved directory by its label.  
 
-### 🎨 Colors & Themes
+### Colors & Themes
 - `fcd colors set -p <primary> -s <secondary> -t <tertiary>` — Set theme colors for fcd menu.  
 - `fcd colors list` — List all available colors.  
 
-### ⚙️ System & Help
+### System & Help
 - `fcd completion` — Generate shell auto-completion scripts.  
 - `fcd help` — Show help for any command.  
 
 ---
 
-## 💡 Examples
+## Examples
 
 ```bash
 # Open interactive menu
@@ -64,6 +64,7 @@ fcd print
 # Manage colors
 fcd colors set -p pink -s white -t black
 fcd colors list
+```
 ### 🛠 Compatibility Status
 fcd is fully functional for the following shells:
 - **bash**

@@ -41,12 +41,12 @@ mkdir -p "$SHARE_DIR"
 # Bash/Zsh wrapper
 cat >"$SHARE_DIR/fcd.sh" <<'EOF'
 fcd() {
-    local output status
+    local output ret
     output=$("$HOME/.local/bin/fcd" "$@")
-    status=$?
-    if [ $status -ne 0 ]; then
+    ret=$?
+    if [ $ret -ne 0 ]; then
         echo "$output"
-        return $status
+        return $ret
     fi
     if [ -d "$output" ]; then
         cd "$output" || return
@@ -60,10 +60,10 @@ EOF
 cat >"$SHARE_DIR/fcd.fish" <<'EOF'
 function fcd
     set output (~/.local/bin/fcd $argv)
-    set status $status
-    if test $status -ne 0
+    set ret $status
+    if test $ret -ne 0
         echo $output
-        return $status
+        return $ret
     end
     if test -d "$output"
         cd $output
@@ -136,7 +136,7 @@ case "$SHELL_NAME" in
     zsh)
         mkdir -p "$ZSH_COMPLETIONS"
         "$BIN_DIR/fcd" completion zsh > "$ZSH_COMPLETIONS/_fcd"
-        COMPLETION_LINE="source $ZSH_COMPLETIONS/_fcd"
+        COMPLETION_LINE=""  # Zsh autoloads
         ;;
     fish)
         mkdir -p "$FISH_COMPLETION_DIR"
@@ -157,7 +157,9 @@ if [ "$SHELL_NAME" = "zsh" ]; then
     FPATH_LINE="fpath+=$ZSH_COMPLETIONS"
     if ! grep -Fxq "$FPATH_LINE" "$RC_FILE"; then
         echo "$FPATH_LINE" >> "$RC_FILE"
-        echo "[✓] Added Zsh completions directory to fpath"
+        echo "autoload -Uz compinit" >> "$RC_FILE"
+        echo "compinit" >> "$RC_FILE"
+        echo "[✓] Added Zsh completions directory + compinit reload"
     fi
 fi
 
