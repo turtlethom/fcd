@@ -17,6 +17,7 @@ var printCmd = &cobra.Command{
 	Use:   "print",
 	Short: "Print all your saved shortcuts",
 	Long:  "Print all your saved shortcuts",
+	Args: cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		if config == nil {
 			fmt.Fprintln(os.Stderr, "config cannot be loaded")

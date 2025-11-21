@@ -125,9 +125,11 @@ func (c *Config) AddShortcut(label, dirPath string) error {
 	}
 	// Checks whether a duplicate Shortcut exists within Config.Shortcuts
 	for _, sc := range c.Shortcuts {
+		// If label collision
 		if sc.Label == label {
 			return fmt.Errorf("shortcut with label %q already exists", label)
 		}
+		// If path collision
 		if sc.Path == absPath {
 			return fmt.Errorf("shortcut for path %q already exists", absPath)
 		}

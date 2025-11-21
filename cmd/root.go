@@ -44,7 +44,8 @@ var (
 	}
 )
 
-// HandleMenu handles the initialization and customization of bubbles/list component
+// HandleRoot handles the initialization and customization of bubbles/list component for fcd
+// This handles the core logic of fcd
 //
 // config - Pointer to a struct representing the current state of user's fcd_config.json
 func handleRoot(config *internal.Config) string {

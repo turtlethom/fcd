@@ -14,8 +14,6 @@ import (
 	"github.com/turtlethom/fcd/internal"
 )
 
-var addValidArgs = []string{}
-
 // addCmd is the cobra command for branching to a Shortcut directory saved within fcd_config.json
 var addCmd = &cobra.Command{
 	Use:   "add [label|label:path]",
@@ -23,15 +21,17 @@ var addCmd = &cobra.Command{
 	Long:  `Add a directory path to be saved as a shortcut`,
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := handleAdd(config, args[0]); err != nil {
-			fmt.Fprintln(os.Stderr, "fcd: Error adding shortcut:", err)
+		labelPathArg := args[0]
+		pwd, err := handleAdd(config, labelPathArg)
+		if err != nil {
+		fmt.Fprintln(os.Stderr, "fcd:", err)
 			os.Exit(1)
 		}
-		fmt.Fprintf(os.Stderr, "fcd: %q successfully saved as a shortcut\n", args[0])
+		fmt.Fprintf(os.Stderr, "fcd: %q successfully saved as a shortcut\n", pwd)
 	},
 }
 
-func handleAdd(config *internal.Config, labelPathArg string) error {
+func handleAdd(config *internal.Config, labelPathArg string) (string, error) {
 	var shortcutLabel, shortcutPath string
 	// If labelPathArg = "label:path", parse "label" and "path"
 	if strings.Contains(labelPathArg, ":") {
@@ -40,14 +40,19 @@ func handleAdd(config *internal.Config, labelPathArg string) error {
 		shortcutPath = parts[1]
 		// If labelPathArg = "path", parse "label" from base of path
 	} else {
-		shortcutPath = labelPathArg
+		// If labelPathArg = "."
+		if labelPathArg == "." {
+			shortcutPath, _ = filepath.Abs(labelPathArg)
+		} else {
+			shortcutPath = labelPathArg
+		}
 		shortcutLabel = filepath.Base(shortcutPath)
 	}
 	// Format "label:path" -> "LABEL:path"
 	shortcutLabel = strings.ToUpper(strings.TrimSpace(shortcutLabel))
 	if err := config.AddShortcut(shortcutLabel, shortcutPath); err != nil {
-		return err
+		return "", err
 	}
 
-	return internal.SaveToConfig(config)
+	return shortcutPath, internal.SaveToConfig(config)
 }

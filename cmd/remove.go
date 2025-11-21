@@ -19,11 +19,12 @@ var removeCmd = &cobra.Command{
 	Long:  `Remove a saved shortcut from your configuration`,
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := handleRemove(config, args[0]); err != nil {
+		label := args[0]
+		if err := handleRemove(config, label); err != nil {
 			fmt.Fprintln(os.Stderr, "fcd: Unable to remove shortcut:", err)
 			os.Exit(1)
 		}
-		fmt.Fprintf(os.Stderr, "fcd: '%q' has been successfully removed\n", args[0])
+		fmt.Fprintf(os.Stderr, "fcd: %q has been successfully removed\n", strings.ToUpper(label))
 	},
 }
 

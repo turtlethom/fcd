@@ -18,6 +18,7 @@ var clearCmd = &cobra.Command{
 	Use:   "clear",
 	Short: "Clear all saved shortcuts",
 	Long:  "Clear all saved shortcuts",
+	Args: cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := handleClear(config); err != nil {
 			fmt.Fprintln(os.Stderr, err)
