@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+
 	"github.com/turtlethom/fcd/internal"
 )
 
@@ -20,7 +21,7 @@ var addCmd = &cobra.Command{
 	Use:   "add [label|label:path]",
 	Short: "Add a directory path to be saved as a shortcut",
 	Long:  `Add a directory path to be saved as a shortcut`,
-	Args: cobra.ExactArgs(1),
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := handleAdd(config, args[0]); err != nil {
 			fmt.Fprintln(os.Stderr, "fcd: Error adding shortcut:", err)
@@ -37,7 +38,7 @@ func handleAdd(config *internal.Config, labelPathArg string) error {
 		parts := strings.SplitN(labelPathArg, ":", 2)
 		shortcutLabel = parts[0]
 		shortcutPath = parts[1]
-	// If labelPathArg = "path", parse "label" from base of path
+		// If labelPathArg = "path", parse "label" from base of path
 	} else {
 		shortcutPath = labelPathArg
 		shortcutLabel = filepath.Base(shortcutPath)
@@ -49,5 +50,4 @@ func handleAdd(config *internal.Config, labelPathArg string) error {
 	}
 
 	return internal.SaveToConfig(config)
-
 }

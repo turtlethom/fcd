@@ -1,10 +1,10 @@
 package internal
 
 import (
-	"strings"
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // IsInsideHome checks if a given path resides within the user's home directory
@@ -51,9 +51,9 @@ func SelectColor(color string) (string, error) {
 		return "#DC143C", nil
 	case "coral":
 		return "#F08080", nil
-	case "pink": 
+	case "pink":
 		return "#FF007F", nil
-	case "red": 
+	case "red":
 		return "#E06C75", nil
 	case "orange":
 		return "#D19A66", nil

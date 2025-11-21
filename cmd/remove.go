@@ -9,15 +9,15 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+
 	"github.com/turtlethom/fcd/internal"
 )
-
 
 var removeCmd = &cobra.Command{
 	Use:   "remove [label]",
 	Short: "Remove a saved shortcut from your configuration",
 	Long:  `Remove a saved shortcut from your configuration`,
-	Args: cobra.ExactArgs(1),
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := handleRemove(config, args[0]); err != nil {
 			fmt.Fprintln(os.Stderr, "fcd: Unable to remove shortcut:", err)
@@ -26,6 +26,7 @@ var removeCmd = &cobra.Command{
 		fmt.Fprintf(os.Stderr, "fcd: '%q' has been successfully removed\n", args[0])
 	},
 }
+
 // handleRemove removes a Shortcut from Config based on the Shortcut.Label
 //
 // label - String representing user's input of a matching label to a Shortcut

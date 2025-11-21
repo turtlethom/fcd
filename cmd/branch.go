@@ -18,6 +18,7 @@ var branchCmd = &cobra.Command{
 	Use:   "branch [label]",
 	Short: "Jump to one of your saved shortcut directories",
 	Long:  "Jump to one of your saved shortcut directories",
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		selectedShortcut := handleBranch(config, args[0])
 		if selectedShortcut != "" {

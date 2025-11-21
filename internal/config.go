@@ -14,13 +14,13 @@ import (
 // as defined in fcd_config.json
 // It is also used as an Item component for the List (bubbles/list)
 type Shortcut struct {
-	Label string `json:"label"`		// Represents the label provided by user
-	Path  string `json:"path"`		// Represents the path provided by user
+	Label string `json:"label"` // Represents the label provided by user
+	Path  string `json:"path"`  // Represents the path provided by user
 }
 
 // Title returns the Item's title for display in bubbles/list component
 // Implements list.Item interface
-func (s Shortcut) Title() string       { return s.Label }
+func (s Shortcut) Title() string { return s.Label }
 
 // Description returns the Item's description for display in bubbles/list component
 // Implements list.Item interface
@@ -33,8 +33,8 @@ func (s Shortcut) FilterValue() string { return s.Label }
 // UserColors defines the user's colors for the bubbles/list component,
 // as defined within fcd_config.json
 type UserColors struct {
-	Primary		string `json:"primary"`
-	Secondary	string `json:"secondary"`
+	Primary   string `json:"primary"`
+	Secondary string `json:"secondary"`
 	Tertiary  string `json:"tertiary"`
 }
 
@@ -43,8 +43,8 @@ type UserColors struct {
 //
 // It manages the state of the current state within the configuration
 type Config struct {
-	Shortcuts 	[]Shortcut 	`json:"shortcuts"`
-	UserColors 	UserColors 	`json:"userColors"`
+	Shortcuts  []Shortcut `json:"shortcuts"`
+	UserColors UserColors `json:"userColors"`
 }
 
 // fetchUserConfig returns the absolute path of fcd_config.json,
@@ -54,20 +54,20 @@ func fetchUserConfig() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(dir, "fcd", "fcd_config.json"), nil	// [USERCONFIG]/fcd/fcd_config.json
+	return filepath.Join(dir, "fcd", "fcd_config.json"), nil // [USERCONFIG]/fcd/fcd_config.json
 }
 
 // CreateConfig initializes the configuration for fcd_config.json,
 // and returns a pointer to a new Config
-// 
+//
 // fcdConfigPath - String representing the absolute path to fcd_config.json
 func CreateDefaultConfig() (*Config, error) {
 	config := &Config{
 		Shortcuts: []Shortcut{},
 		UserColors: UserColors{
-				Primary: "",
-				Secondary: "",
-				Tertiary: "",
+			Primary:   "",
+			Secondary: "",
+			Tertiary:  "",
 		},
 	}
 	// Saving default state of new Config to fcd_config.json
@@ -93,7 +93,7 @@ func LoadConfig(fcdConfigPath string) (*Config, error) {
 	// If file is empty or malformed JSON data in config file → reset to empty config
 	if err := decoder.Decode(&config); err != nil {
 		// return &Config{Shortcuts: []Shortcut{}}, nil
-		return CreateDefaultConfig();
+		return CreateDefaultConfig()
 	}
 	return &config, nil
 }
@@ -112,6 +112,7 @@ func HandleConfig() (*Config, error) {
 	}
 	return LoadConfig(fcdConfigPath)
 }
+
 // AddShortcut appends a new shortcut to the Config.Shortcuts array of a Config instance
 //
 // label - String representing title for new Shortcut

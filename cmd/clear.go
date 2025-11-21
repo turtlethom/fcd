@@ -19,12 +19,12 @@ var clearCmd = &cobra.Command{
 	Short: "Clear all saved shortcuts",
 	Long:  "Clear all saved shortcuts",
 	Run: func(cmd *cobra.Command, args []string) {
-			if err := handleClear(config); err != nil {
-				fmt.Fprintln(os.Stderr, err)
-				os.Exit(1)
-			} else {
-				fmt.Fprintln(os.Stderr, "fcd: Successfully cleared all shortcuts")
-			}
+		if err := handleClear(config); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		} else {
+			fmt.Fprintln(os.Stderr, "fcd: Successfully cleared all shortcuts")
+		}
 	},
 }
 

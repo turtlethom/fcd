@@ -96,7 +96,8 @@ func NewStyles(config *Config) Styles {
 			Foreground(primary).
 			Background(secondary),
 	}
-}	
+}
+
 // Responsible for rendering each item in the FCD Menu
 func newDelegate(s Styles) list.DefaultDelegate {
 	// Initializing a new delegate that controls how items are rendered within bubbles/list
@@ -135,7 +136,7 @@ func CreateBubblesList(items []list.Item, styles Styles) list.Model {
 	// Styles the right portion of items count
 	list.Styles.StatusBarFilterCount = styles.StatusBarCount
 	// Manages Styles For Filter Menu
-	list.FilterInput.PromptStyle = styles.FilterPrompt 
+	list.FilterInput.PromptStyle = styles.FilterPrompt
 	list.FilterInput.Cursor.Style = styles.FilterCursor
 	// Manages The Title Of The List
 	list.Title = styles.MainTitle.Render("FCD - Shortcut Menu")

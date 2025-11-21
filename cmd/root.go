@@ -25,7 +25,7 @@ var (
 	rootCmd = &cobra.Command{
 		Use:   "fcd",
 		Short: "fcd changes to bookmarked directories",
-		Long:  `fcd (fast change directory) is a CLI tool for navigating to directories saved by the user.
+		Long: `fcd (fast change directory) is a CLI tool for navigating to directories saved by the user.
 
 		[WARNING]: Valid shortcuts limited to the user's home directory
 		All user configuration is stored within 'fcd_config.json'`,
