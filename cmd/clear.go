@@ -11,7 +11,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/turtlethom/fcd/internal"
+	"github.com/turtlethom/fcd/internal/data"
 )
 
 var clearCmd = &cobra.Command{
@@ -20,7 +20,7 @@ var clearCmd = &cobra.Command{
 	Long:  "Clear all saved shortcuts",
 	Args: cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := handleClear(config); err != nil {
+		if err := handleClear(USER_CONFIG); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		} else {
@@ -30,7 +30,7 @@ var clearCmd = &cobra.Command{
 }
 
 // handleClear handles clearing all saved Shortcut from fcd_config.json
-func handleClear(config *internal.Config) error {
+func handleClear(config *data.Config) error {
 	// Get confirmation from user on clearing Shortcuts (y/n)
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Fprintf(os.Stderr, "fcd: Are you sure you want to clear all bookmarks? (y/n): ")
@@ -40,8 +40,8 @@ func handleClear(config *internal.Config) error {
 	switch strings.ToLower(input) {
 	// Update the config.Shortcuts to empty array and save to fcd_config.json
 	case "y":
-		config.Shortcuts = []internal.Shortcut{}
-		return internal.SaveToConfig(config)
+		config.Shortcuts = []data.Shortcut{}
+		return data.SaveToConfig(config)
 	// Cancel operations if "n" or some other invalid answer
 	case "n":
 		fallthrough

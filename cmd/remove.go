@@ -10,7 +10,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/turtlethom/fcd/internal"
+	"github.com/turtlethom/fcd/internal/data"
 )
 
 var removeCmd = &cobra.Command{
@@ -20,7 +20,7 @@ var removeCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		label := args[0]
-		if err := handleRemove(config, label); err != nil {
+		if err := handleRemove(USER_CONFIG, label); err != nil {
 			fmt.Fprintln(os.Stderr, "fcd: Unable to remove shortcut:", err)
 			os.Exit(1)
 		}
@@ -31,11 +31,11 @@ var removeCmd = &cobra.Command{
 // handleRemove removes a Shortcut from Config based on the Shortcut.Label
 //
 // label - String representing user's input of a matching label to a Shortcut
-func handleRemove(config *internal.Config, label string) error {
+func handleRemove(config *data.Config, label string) error {
 	// Convert commandArg to match shortcut label
 	removeLabel := strings.ToUpper(strings.TrimSpace(label))
 	// Create new shorcuts
-	newShortcuts := make([]internal.Shortcut, 0, len(config.Shortcuts))
+	newShortcuts := make([]data.Shortcut, 0, len(config.Shortcuts))
 	found := false
 	for _, sc := range config.Shortcuts {
 		// Exclude shortcut from being added back to new Shortcuts array
@@ -52,5 +52,5 @@ func handleRemove(config *internal.Config, label string) error {
 	}
 	// Update new Shortcuts array and save data to fcd_config.json
 	config.Shortcuts = newShortcuts
-	return internal.SaveToConfig(config)
+	return data.SaveToConfig(config)
 }

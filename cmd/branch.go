@@ -10,7 +10,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/turtlethom/fcd/internal"
+	"github.com/turtlethom/fcd/internal/data"
 )
 
 // branchCmd is the cobra command for branching to a Shortcut directory saved within fcd_config.json
@@ -21,7 +21,7 @@ var branchCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		label := args[0]
-		selectedShortcut := handleBranch(config, label)
+		selectedShortcut := handleBranch(USER_CONFIG, label)
 		if selectedShortcut != "" {
 			fmt.Println(selectedShortcut)
 		}
@@ -29,7 +29,7 @@ var branchCmd = &cobra.Command{
 }
 
 // handleBranch handles the logic for branching to a Shortcut
-func handleBranch(config *internal.Config, label string) string {
+func handleBranch(config *data.Config, label string) string {
 	// Iterate and check LABEL exists in config.Shortcuts
 	for _, sc := range config.Shortcuts {
 		if sc.Label == strings.ToUpper(strings.TrimSpace(label)) {

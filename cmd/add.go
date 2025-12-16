@@ -11,7 +11,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/turtlethom/fcd/internal"
+	"github.com/turtlethom/fcd/internal/data"
 )
 
 // addCmd is the cobra command for branching to a Shortcut directory saved within fcd_config.json
@@ -22,7 +22,7 @@ var addCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		labelPathArg := args[0]
-		pwd, err := handleAdd(config, labelPathArg)
+		pwd, err := handleAdd(USER_CONFIG, labelPathArg)
 		if err != nil {
 		fmt.Fprintln(os.Stderr, "fcd:", err)
 			os.Exit(1)
@@ -31,7 +31,7 @@ var addCmd = &cobra.Command{
 	},
 }
 
-func handleAdd(config *internal.Config, labelPathArg string) (string, error) {
+func handleAdd(config *data.Config, labelPathArg string) (string, error) {
 	var shortcutLabel, shortcutPath string
 	// If labelPathArg = "label:path", parse "label" and "path"
 	if strings.Contains(labelPathArg, ":") {
@@ -54,5 +54,5 @@ func handleAdd(config *internal.Config, labelPathArg string) (string, error) {
 		return "", err
 	}
 
-	return shortcutPath, internal.SaveToConfig(config)
+	return shortcutPath, data.SaveToConfig(config)
 }

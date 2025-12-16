@@ -9,7 +9,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/turtlethom/fcd/internal"
+	"github.com/turtlethom/fcd/internal/data"
 )
 
 var (
@@ -26,12 +26,12 @@ var (
 			if len(primaryColor)+len(secondaryColor)+len(tertiaryColor) == 0 {
 				cmd.Help()
 			}
-			handleSetColor(config)
+			handleSetColor(USER_CONFIG)
 		},
 	}
 )
 
-func handleSetColor(config *internal.Config) {
+func handleSetColor(config *data.Config) {
 	// If --primary color
 	if primaryColor != "" {
 		hex, valid := validateColorChoice("primary", primaryColor)
@@ -54,7 +54,7 @@ func handleSetColor(config *internal.Config) {
 		}
 	}
 
-	internal.SaveToConfig(config)
+	data.SaveToConfig(config)
 }
 
 func validateColorChoice(colorFor string, colorName string) (string, bool) {

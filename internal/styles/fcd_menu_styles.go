@@ -1,32 +1,15 @@
-package internal
+package styles
 
 import (
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/turtlethom/fcd/internal/data"
 )
-
-// Styles holds all the styles for the bubbles/list component
-type Styles struct {
-	Primary   lipgloss.Color
-	Secondary lipgloss.Color
-	Tertiary  lipgloss.Color
-
-	NormalTitle    lipgloss.Style
-	NormalDesc     lipgloss.Style
-	SelectedTitle  lipgloss.Style
-	SelectedDesc   lipgloss.Style
-	MainTitle      lipgloss.Style
-	StatusBar      lipgloss.Style
-	StatusBarCount lipgloss.Style
-	FilterMatch    lipgloss.Style
-	FilterPrompt   lipgloss.Style
-	FilterCursor   lipgloss.Style
-}
 
 // NewStyles initializes the styles that are configured for bubbles/list component
 //
 // Returns a Styles struct with all initialized styles for the component
-func NewStyles(config *Config) Styles {
+func NewFCDMenuStyles(config *data.Config) Styles {
 	// Sets colors of the menu based on user configuration
 	primary := lipgloss.Color(config.UserColors.Primary)
 	secondary := lipgloss.Color(config.UserColors.Secondary)
@@ -99,7 +82,7 @@ func NewStyles(config *Config) Styles {
 }
 
 // Responsible for rendering each item in the FCD Menu
-func newDelegate(s Styles) list.DefaultDelegate {
+func newFCDMenuDelegate(s Styles) list.DefaultDelegate {
 	// Initializing a new delegate that controls how items are rendered within bubbles/list
 	delegate := list.NewDefaultDelegate()
 	// Normal configuration
@@ -114,13 +97,13 @@ func newDelegate(s Styles) list.DefaultDelegate {
 	return delegate
 }
 
-// CreateBubblesList creates the FCD Menu with configuration
+// CreateFCDMenuComponent creates the FCD Menu component with custom configuration
 //
-// The bubbles/list component is customized as defined by Shortcuts in the list,
-// as well as the Styles configured
-func CreateBubblesList(items []list.Item, styles Styles) list.Model {
+// The bubbles/list component contains strings representing directory paths as defined by Shortcuts in the list,
+// as well as the Styles
+func CreateFCDMenuComponent(items []list.Item, styles Styles) list.Model {
 	// Configured view of each item
-	delegate := newDelegate(styles)
+	delegate := newFCDMenuDelegate(styles)
 
 	// Instantiating a Bubbles List with items and custom delegate
 	list := list.New(items, delegate, 0, 10)

@@ -7,11 +7,11 @@ import (
 	"log"
 
 	"github.com/turtlethom/fcd/cmd"
-	"github.com/turtlethom/fcd/internal"
+	"github.com/turtlethom/fcd/internal/data"
 )
 
 func main() {
-	config, err := internal.HandleConfig()
+	config, err := data.HandleConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
